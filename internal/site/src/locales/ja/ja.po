@@ -105,6 +105,12 @@ msgstr "アクティブなアラート"
 msgid "Active state"
 msgstr "アクティブ状態"
 
+#: src/components/quick-links.tsx
+#: src/components/routes/settings/general.tsx
+#: src/components/routes/settings/general.tsx
+msgid "Add"
+msgstr ""
+
 #: src/components/add-system.tsx
 #: src/components/routes/settings/quiet-hours.tsx
 #: src/components/routes/settings/quiet-hours.tsx
@@ -115,9 +121,21 @@ msgstr "{foo}を追加"
 msgid "Add <0>System</0>"
 msgstr "<0>システム</0>を追加"
 
+#: src/components/routes/settings/general.tsx
+msgid "Add External Link"
+msgstr ""
+
+#: src/components/quick-links.tsx
+msgid "Add Quick Link"
+msgstr ""
+
 #: src/components/add-system.tsx
 msgid "Add system"
 msgstr "システムを追加"
+
+#: src/components/add-system.tsx
+msgid "Add to quick links"
+msgstr ""
 
 #: src/components/routes/settings/notifications.tsx
 msgid "Add URL"
@@ -162,6 +180,10 @@ msgstr "アラート"
 msgid "All Containers"
 msgstr "すべてのコンテナ"
 
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "All packages are up to date."
+msgstr ""
+
 #: src/components/alerts/alerts-sheet.tsx
 #: src/components/command-palette.tsx
 #: src/components/routes/home.tsx
@@ -170,6 +192,10 @@ msgstr "すべてのコンテナ"
 #: src/components/systems-table/systems-table.tsx
 msgid "All Systems"
 msgstr "すべてのシステム"
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Apply selected"
+msgstr ""
 
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Are you sure you want to delete {name}?"
@@ -182,6 +208,15 @@ msgstr "よろしいですか？"
 #: src/components/copy-to-clipboard.tsx
 msgid "Automatic copy requires a secure context."
 msgstr "自動コピーには安全なコンテキストが必要です。"
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Available version"
+msgstr ""
+
+#. placeholder {0}: updates.length
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Available: {0}. Nothing is installed without your explicit approval."
+msgstr ""
 
 #: src/components/routes/system.tsx
 msgid "Average"
@@ -299,7 +334,11 @@ msgstr "開始可能"
 msgid "Can stop"
 msgstr "停止可能"
 
+#: src/components/quick-links.tsx
+#: src/components/quick-links.tsx
 #: src/components/routes/settings/alerts-history-data-table.tsx
+#: src/components/routes/settings/general.tsx
+#: src/components/routes/settings/general.tsx
 #: src/components/routes/settings/quiet-hours.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Cancel"
@@ -312,6 +351,13 @@ msgstr "機能"
 #: src/components/routes/system/smart-table.tsx
 msgid "Capacity"
 msgstr "容量"
+
+#: src/components/add-system.tsx
+#: src/components/quick-links.tsx
+#: src/components/quick-links.tsx
+#: src/components/routes/settings/general.tsx
+msgid "Category"
+msgstr ""
 
 #: src/components/routes/settings/config-yaml.tsx
 msgid "Caution - potential data loss"
@@ -349,6 +395,10 @@ msgstr "{email}を確認してリセットリンクを探してください。"
 #: src/components/routes/settings/layout.tsx
 msgid "Check logs for more details."
 msgstr "詳細についてはログを確認してください。"
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Check now"
+msgstr ""
 
 #: src/components/routes/settings/notifications.tsx
 msgid "Check your notification service"
@@ -512,6 +562,10 @@ msgstr "累積アップロード"
 msgid "Current state"
 msgstr "現在の状態"
 
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Current version"
+msgstr ""
+
 #. Power Cycles
 #: src/components/routes/system/smart-table.tsx
 msgid "Cycles"
@@ -593,6 +647,12 @@ msgstr "DockerネットワークI/O"
 msgid "Documentation"
 msgstr "ドキュメント"
 
+#: src/components/add-system.tsx
+#: src/components/quick-links.tsx
+#: src/components/quick-links.tsx
+msgid "Domain URL"
+msgstr ""
+
 #. Context: System is down
 #: src/components/alerts-history-columns.tsx
 #: src/components/routes/system/info-bar.tsx
@@ -622,6 +682,14 @@ msgstr "編集"
 #: src/components/routes/settings/quiet-hours.tsx
 msgid "Edit {foo}"
 msgstr "{foo}を編集"
+
+#: src/components/routes/settings/general.tsx
+msgid "Edit External Link"
+msgstr ""
+
+#: src/components/quick-links.tsx
+msgid "Edit Quick Link"
+msgstr ""
 
 #: src/components/login/auth-form.tsx
 #: src/components/login/forgot-pass-form.tsx
@@ -660,6 +728,8 @@ msgid "Ephemeral"
 msgstr "一時的"
 
 #: src/components/login/auth-form.tsx
+#: src/components/package-updates-table/package-updates-table.tsx
+#: src/components/package-updates-table/package-updates-table.tsx
 #: src/components/routes/settings/alerts-history-data-table.tsx
 #: src/components/routes/settings/config-yaml.tsx
 #: src/components/routes/settings/notifications.tsx
@@ -706,9 +776,14 @@ msgid "Export your current systems configuration."
 msgstr "現在のシステム設定をエクスポートします。"
 
 #: src/components/routes/settings/general.tsx
+msgid "External Links"
+msgstr ""
+
+#: src/components/routes/settings/general.tsx
 msgid "Fahrenheit (°F)"
 msgstr "華氏 (°F)"
 
+#: src/components/package-updates-table/package-updates-table.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Failed"
 msgstr "失敗"
@@ -717,9 +792,17 @@ msgstr "失敗"
 msgid "Failed Attributes:"
 msgstr "失敗した属性:"
 
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Failed to apply updates"
+msgstr ""
+
 #: src/lib/api.ts
 msgid "Failed to authenticate"
 msgstr "認証に失敗しました"
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Failed to check for updates"
+msgstr ""
 
 #: src/components/routes/settings/layout.tsx
 #: src/components/routes/settings/notifications.tsx
@@ -741,6 +824,7 @@ msgid "Failed: {0}"
 msgstr "失敗: {0}"
 
 #: src/components/containers-table/containers-table.tsx
+#: src/components/package-updates-table/package-updates-table.tsx
 #: src/components/routes/settings/alerts-history-data-table.tsx
 #: src/components/routes/system.tsx
 #: src/components/routes/system/smart-table.tsx
@@ -816,6 +900,10 @@ msgstr "Homebrew コマンド"
 msgid "Host / IP"
 msgstr "ホスト / IP"
 
+#: src/components/routes/settings/general.tsx
+msgid "Icon"
+msgstr ""
+
 #. Context: Battery state
 #: src/lib/i18n.ts
 msgid "Idle"
@@ -837,6 +925,10 @@ msgstr "非アクティブ"
 #: src/components/login/auth-form.tsx
 msgid "Invalid email address."
 msgstr "無効なメールアドレスです。"
+
+#: src/components/routes/settings/general.tsx
+msgid "Label"
+msgstr ""
 
 #: src/components/lang-toggle.tsx
 #: src/components/routes/settings/general.tsx
@@ -889,6 +981,12 @@ msgstr "ロード状態"
 msgid "Loading..."
 msgstr "読み込み中..."
 
+#: src/components/add-system.tsx
+#: src/components/quick-links.tsx
+#: src/components/quick-links.tsx
+msgid "Local URL"
+msgstr ""
+
 #: src/components/navbar.tsx
 msgid "Log Out"
 msgstr "ログアウト"
@@ -919,6 +1017,10 @@ msgstr "メインPID"
 #: src/components/routes/settings/layout.tsx
 msgid "Manage display and notification preferences."
 msgstr "表示と通知の設定を管理します。"
+
+#: src/components/routes/settings/general.tsx
+msgid "Manage your favorite external links displayed on the dashboard."
+msgstr ""
 
 #: src/components/add-system.tsx
 #: src/components/routes/settings/tokens-fingerprints.tsx
@@ -963,6 +1065,8 @@ msgstr "モデル"
 #: src/components/add-system.tsx
 #: src/components/alerts-history-columns.tsx
 #: src/components/containers-table/containers-table-columns.tsx
+#: src/components/quick-links.tsx
+#: src/components/quick-links.tsx
 #: src/components/systemd-table/systemd-table-columns.tsx
 #: src/components/systemd-table/systemd-table.tsx
 msgid "Name"
@@ -995,6 +1099,14 @@ msgstr "ネットワーク単位"
 msgid "No"
 msgstr "いいえ"
 
+#: src/components/routes/settings/general.tsx
+msgid "No external links yet. Click Add to create one."
+msgstr ""
+
+#: src/components/quick-links.tsx
+msgid "No quick links yet. Click + to add one."
+msgstr ""
+
 #: src/components/command-palette.tsx
 #: src/components/systemd-table/systemd-table.tsx
 msgid "No results found."
@@ -1003,6 +1115,7 @@ msgstr "結果が見つかりませんでした。"
 #: src/components/containers-table/containers-table.tsx
 #: src/components/containers-table/containers-table.tsx
 #: src/components/containers-table/containers-table.tsx
+#: src/components/package-updates-table/package-updates-table.tsx
 #: src/components/routes/settings/alerts-history-data-table.tsx
 #: src/components/routes/system/smart-table.tsx
 #: src/components/systemd-table/systemd-table.tsx
@@ -1017,6 +1130,10 @@ msgstr "このデバイスのS.M.A.R.T.属性は利用できません。"
 #: src/components/systems-table/systems-table.tsx
 msgid "No systems found."
 msgstr "システムが見つかりませんでした。"
+
+#: src/components/quick-links.tsx
+msgid "No URLs configured"
+msgstr ""
 
 #: src/components/command-palette.tsx
 #: src/components/routes/settings/layout.tsx
@@ -1060,6 +1177,18 @@ msgstr "その他"
 #: src/components/alerts/alerts-sheet.tsx
 msgid "Overwrite existing alerts"
 msgstr "既存のアラートを上書き"
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Package"
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Package Updates"
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Packages updated"
+msgstr ""
 
 #: src/components/command-palette.tsx
 #: src/components/command-palette.tsx
@@ -1187,6 +1316,10 @@ msgstr "プロセス開始"
 msgid "Public Key"
 msgstr "公開鍵"
 
+#: src/components/quick-links.tsx
+msgid "Quick Links"
+msgstr ""
+
 #: src/components/routes/settings/quiet-hours.tsx
 msgid "Quiet Hours"
 msgstr "サイレント時間"
@@ -1270,6 +1403,11 @@ msgstr "S.M.A.R.T.詳細"
 msgid "S.M.A.R.T. Self-Test"
 msgstr "S.M.A.R.T.セルフテスト"
 
+#: src/components/quick-links.tsx
+#: src/components/routes/settings/general.tsx
+msgid "Save"
+msgstr ""
+
 #: src/components/routes/settings/notifications.tsx
 msgid "Save address using enter key or comma. Leave blank to disable email notifications."
 msgstr "Enterキーまたはカンマを使用してアドレスを保存します。空白のままにするとメール通知が無効になります。"
@@ -1315,6 +1453,10 @@ msgstr "アラートの受信方法を設定するには<0>通知設定</0>を�
 msgid "Select {foo}"
 msgstr "{foo}を選択"
 
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Select all"
+msgstr ""
+
 #: src/components/routes/system.tsx
 msgid "Sent"
 msgstr "送信"
@@ -1354,6 +1496,10 @@ msgstr "サインイン"
 #: src/components/command-palette.tsx
 msgid "SMTP settings"
 msgstr "SMTP設定"
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Some packages failed to update"
+msgstr ""
 
 #: src/components/systems-table/systems-table.tsx
 msgid "Sort By"
@@ -1628,6 +1774,8 @@ msgid "Update"
 msgstr "更新"
 
 #: src/components/containers-table/containers-table-columns.tsx
+#: src/components/package-updates-table/package-updates-table.tsx
+#: src/components/package-updates-table/package-updates-table.tsx
 #: src/components/routes/system/smart-table.tsx
 #: src/components/systemd-table/systemd-table-columns.tsx
 msgid "Updated"
@@ -1637,13 +1785,22 @@ msgstr "更新済み"
 msgid "Updated every 10 minutes."
 msgstr "10分ごとに更新されます。"
 
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Updates"
+msgstr ""
+
 #: src/components/routes/system/network-sheet.tsx
 msgid "Upload"
 msgstr "アップロード"
 
 #: src/components/routes/system/info-bar.tsx
+#: src/components/systems-table/systems-table-columns.tsx
 msgid "Uptime"
 msgstr "稼働時間"
+
+#: src/components/routes/settings/general.tsx
+msgid "URL"
+msgstr ""
 
 #: src/components/routes/system.tsx
 #: src/components/routes/system.tsx

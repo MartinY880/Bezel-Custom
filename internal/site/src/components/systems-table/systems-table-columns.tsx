@@ -14,6 +14,7 @@ import {
 	HardDriveIcon,
 	MemoryStickIcon,
 	MoreHorizontalIcon,
+	PackageIcon,
 	PauseCircleIcon,
 	PenBoxIcon,
 	PlayCircleIcon,
@@ -371,6 +372,28 @@ export function SystemsTableColumns(viewMode: "table" | "grid"): ColumnDef<Syste
 						<span className="text-muted-foreground text-sm -ms-0.5">
 							({t`Failed`.toLowerCase()}: {numFailed})
 						</span>
+					</span>
+				)
+			},
+		},
+		{
+			accessorFn: ({ info }) => info.pu ?? 0,
+			id: "updates",
+			name: () => t`Updates`,
+			size: 50,
+			Icon: PackageIcon,
+			header: sortableHeader,
+			hideSort: true,
+			cell(info) {
+				const sys = info.row.original
+				const count = sys.info.pu ?? 0
+				if (sys.status !== SystemStatus.Up || count === 0) {
+					return null
+				}
+				return (
+					<span className="tabular-nums whitespace-nowrap flex gap-1.5 items-center">
+						<span className={cn("block size-2 rounded-full", STATUS_COLORS[SystemStatus.Pending])} />
+						{count}
 					</span>
 				)
 			},

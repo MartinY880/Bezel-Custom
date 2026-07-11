@@ -83,6 +83,17 @@ export interface SystemInfo {
 	efs?: Record<string, number>
 	/** services [totalServices, numFailedServices] */
 	sv?: [number, number]
+	/** count of available package updates */
+	pu?: number
+}
+
+export interface PackageUpdate {
+	/** package name */
+	n: string
+	/** current version */
+	cv?: string
+	/** available version */
+	av?: string
 }
 
 export interface SystemStats {

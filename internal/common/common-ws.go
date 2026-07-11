@@ -22,6 +22,10 @@ const (
 	GetSmartData
 	// Request detailed systemd service info from agent
 	GetSystemdInfo
+	// Request list of available OS package updates from agent
+	GetPackageUpdates
+	// Install selected OS package updates on agent
+	ApplyPackageUpdates
 	// Add new actions here...
 )
 
@@ -73,4 +77,12 @@ type ContainerInfoRequest struct {
 
 type SystemdInfoRequest struct {
 	ServiceName string `cbor:"0,keyasint"`
+}
+
+type PackageUpdatesRequest struct {
+	Refresh bool `cbor:"0,keyasint,omitempty"` // force a fresh check instead of returning cached results
+}
+
+type ApplyPackageUpdatesRequest struct {
+	Packages []string `cbor:"0,keyasint"`
 }

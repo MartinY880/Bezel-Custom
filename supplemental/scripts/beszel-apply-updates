@@ -1,0 +1,38 @@
+#!/bin/bash
+# Locked-down privilege wrapper for the Beszel agent's package-update apply path.
+#
+# Install (only needed when the agent does NOT run as root):
+#   install -o root -g root -m 755 beszel-apply-updates /usr/local/bin/beszel-apply-updates
+#   echo 'beszel ALL=(root) NOPASSWD: /usr/local/bin/beszel-apply-updates' > /etc/sudoers.d/beszel-apply-updates
+#   chmod 440 /etc/sudoers.d/beszel-apply-updates
+#
+# The agent calls: sudo -n /usr/local/bin/beszel-apply-updates <pkg> [<pkg>...]
+set -euo pipefail
+
+if [ "$#" -eq 0 ]; then
+  echo "Usage: $0 <package> [<package>...]" >&2
+  exit 1
+fi
+
+for pkg in "$@"; do
+  if [[ ! "$pkg" =~ ^[A-Za-z0-9][A-Za-z0-9.+:_-]*$ ]]; then
+    echo "Rejected invalid package name: $pkg" >&2
+    exit 1
+  fi
+done
+
+if command -v apt-get >/dev/null 2>&1; then
+  export DEBIAN_FRONTEND=noninteractive
+  exec apt-get install --only-upgrade -y "$@"
+elif command -v dnf >/dev/null 2>&1; then
+  exec dnf update -y "$@"
+elif command -v yum >/dev/null 2>&1; then
+  exec yum update -y "$@"
+elif command -v apk >/dev/null 2>&1; then
+  exec apk add -u "$@"
+elif command -v pacman >/dev/null 2>&1; then
+  exec pacman -S --noconfirm "$@"
+fi
+
+echo "No supported package manager found" >&2
+exit 1

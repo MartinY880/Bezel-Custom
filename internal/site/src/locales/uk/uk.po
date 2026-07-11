@@ -105,6 +105,12 @@ msgstr "Активні сповіщення"
 msgid "Active state"
 msgstr "Активний стан"
 
+#: src/components/quick-links.tsx
+#: src/components/routes/settings/general.tsx
+#: src/components/routes/settings/general.tsx
+msgid "Add"
+msgstr ""
+
 #: src/components/add-system.tsx
 #: src/components/routes/settings/quiet-hours.tsx
 #: src/components/routes/settings/quiet-hours.tsx
@@ -115,9 +121,21 @@ msgstr ""
 msgid "Add <0>System</0>"
 msgstr "Додати <0>Систему</0>"
 
+#: src/components/routes/settings/general.tsx
+msgid "Add External Link"
+msgstr ""
+
+#: src/components/quick-links.tsx
+msgid "Add Quick Link"
+msgstr ""
+
 #: src/components/add-system.tsx
 msgid "Add system"
 msgstr "Додати систему"
+
+#: src/components/add-system.tsx
+msgid "Add to quick links"
+msgstr ""
 
 #: src/components/routes/settings/notifications.tsx
 msgid "Add URL"
@@ -162,6 +180,10 @@ msgstr "Сповіщення"
 msgid "All Containers"
 msgstr "Всі контейнери"
 
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "All packages are up to date."
+msgstr ""
+
 #: src/components/alerts/alerts-sheet.tsx
 #: src/components/command-palette.tsx
 #: src/components/routes/home.tsx
@@ -170,6 +192,10 @@ msgstr "Всі контейнери"
 #: src/components/systems-table/systems-table.tsx
 msgid "All Systems"
 msgstr "Всі системи"
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Apply selected"
+msgstr ""
 
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Are you sure you want to delete {name}?"
@@ -182,6 +208,15 @@ msgstr "Ви впевнені?"
 #: src/components/copy-to-clipboard.tsx
 msgid "Automatic copy requires a secure context."
 msgstr "Автоматичне копіювання вимагає безпечного контексту."
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Available version"
+msgstr ""
+
+#. placeholder {0}: updates.length
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Available: {0}. Nothing is installed without your explicit approval."
+msgstr ""
 
 #: src/components/routes/system.tsx
 msgid "Average"
@@ -299,7 +334,11 @@ msgstr "Може запустити"
 msgid "Can stop"
 msgstr "Може зупинити"
 
+#: src/components/quick-links.tsx
+#: src/components/quick-links.tsx
 #: src/components/routes/settings/alerts-history-data-table.tsx
+#: src/components/routes/settings/general.tsx
+#: src/components/routes/settings/general.tsx
 #: src/components/routes/settings/quiet-hours.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Cancel"
@@ -312,6 +351,13 @@ msgstr "Можливості"
 #: src/components/routes/system/smart-table.tsx
 msgid "Capacity"
 msgstr "Ємність"
+
+#: src/components/add-system.tsx
+#: src/components/quick-links.tsx
+#: src/components/quick-links.tsx
+#: src/components/routes/settings/general.tsx
+msgid "Category"
+msgstr ""
 
 #: src/components/routes/settings/config-yaml.tsx
 msgid "Caution - potential data loss"
@@ -349,6 +395,10 @@ msgstr "Перевірте {email} для отримання посилання 
 #: src/components/routes/settings/layout.tsx
 msgid "Check logs for more details."
 msgstr "Перевірте журнали для отримання додаткової інформації."
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Check now"
+msgstr ""
 
 #: src/components/routes/settings/notifications.tsx
 msgid "Check your notification service"
@@ -512,6 +562,10 @@ msgstr "Кумулятивне відвантаження"
 msgid "Current state"
 msgstr "Поточний стан"
 
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Current version"
+msgstr ""
+
 #. Power Cycles
 #: src/components/routes/system/smart-table.tsx
 msgid "Cycles"
@@ -593,6 +647,12 @@ msgstr "Мережевий ввід/вивід Docker"
 msgid "Documentation"
 msgstr "Документація"
 
+#: src/components/add-system.tsx
+#: src/components/quick-links.tsx
+#: src/components/quick-links.tsx
+msgid "Domain URL"
+msgstr ""
+
 #. Context: System is down
 #: src/components/alerts-history-columns.tsx
 #: src/components/routes/system/info-bar.tsx
@@ -621,6 +681,14 @@ msgstr "Редагувати"
 #: src/components/add-system.tsx
 #: src/components/routes/settings/quiet-hours.tsx
 msgid "Edit {foo}"
+msgstr ""
+
+#: src/components/routes/settings/general.tsx
+msgid "Edit External Link"
+msgstr ""
+
+#: src/components/quick-links.tsx
+msgid "Edit Quick Link"
 msgstr ""
 
 #: src/components/login/auth-form.tsx
@@ -660,6 +728,8 @@ msgid "Ephemeral"
 msgstr "Ефемерний"
 
 #: src/components/login/auth-form.tsx
+#: src/components/package-updates-table/package-updates-table.tsx
+#: src/components/package-updates-table/package-updates-table.tsx
 #: src/components/routes/settings/alerts-history-data-table.tsx
 #: src/components/routes/settings/config-yaml.tsx
 #: src/components/routes/settings/notifications.tsx
@@ -706,9 +776,14 @@ msgid "Export your current systems configuration."
 msgstr "Експортуйте поточну конфігурацію систем."
 
 #: src/components/routes/settings/general.tsx
+msgid "External Links"
+msgstr ""
+
+#: src/components/routes/settings/general.tsx
 msgid "Fahrenheit (°F)"
 msgstr "Фаренгейт (°F)"
 
+#: src/components/package-updates-table/package-updates-table.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Failed"
 msgstr "Не вдалося"
@@ -717,9 +792,17 @@ msgstr "Не вдалося"
 msgid "Failed Attributes:"
 msgstr "Невдалі атрибути:"
 
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Failed to apply updates"
+msgstr ""
+
 #: src/lib/api.ts
 msgid "Failed to authenticate"
 msgstr "Не вдалося автентифікувати"
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Failed to check for updates"
+msgstr ""
 
 #: src/components/routes/settings/layout.tsx
 #: src/components/routes/settings/notifications.tsx
@@ -741,6 +824,7 @@ msgid "Failed: {0}"
 msgstr "Невдало: {0}"
 
 #: src/components/containers-table/containers-table.tsx
+#: src/components/package-updates-table/package-updates-table.tsx
 #: src/components/routes/settings/alerts-history-data-table.tsx
 #: src/components/routes/system.tsx
 #: src/components/routes/system/smart-table.tsx
@@ -816,6 +900,10 @@ msgstr "Команда Homebrew"
 msgid "Host / IP"
 msgstr "Хост / IP"
 
+#: src/components/routes/settings/general.tsx
+msgid "Icon"
+msgstr ""
+
 #. Context: Battery state
 #: src/lib/i18n.ts
 msgid "Idle"
@@ -837,6 +925,10 @@ msgstr "Неактивне"
 #: src/components/login/auth-form.tsx
 msgid "Invalid email address."
 msgstr "Неправильна адреса електронної пошти."
+
+#: src/components/routes/settings/general.tsx
+msgid "Label"
+msgstr ""
 
 #: src/components/lang-toggle.tsx
 #: src/components/routes/settings/general.tsx
@@ -889,6 +981,12 @@ msgstr "Стан завантаження"
 msgid "Loading..."
 msgstr "Завантаження..."
 
+#: src/components/add-system.tsx
+#: src/components/quick-links.tsx
+#: src/components/quick-links.tsx
+msgid "Local URL"
+msgstr ""
+
 #: src/components/navbar.tsx
 msgid "Log Out"
 msgstr "Вийти"
@@ -919,6 +1017,10 @@ msgstr "Основний PID"
 #: src/components/routes/settings/layout.tsx
 msgid "Manage display and notification preferences."
 msgstr "Керуйте параметрами відображення та сповіщень."
+
+#: src/components/routes/settings/general.tsx
+msgid "Manage your favorite external links displayed on the dashboard."
+msgstr ""
 
 #: src/components/add-system.tsx
 #: src/components/routes/settings/tokens-fingerprints.tsx
@@ -963,6 +1065,8 @@ msgstr "Модель"
 #: src/components/add-system.tsx
 #: src/components/alerts-history-columns.tsx
 #: src/components/containers-table/containers-table-columns.tsx
+#: src/components/quick-links.tsx
+#: src/components/quick-links.tsx
 #: src/components/systemd-table/systemd-table-columns.tsx
 #: src/components/systemd-table/systemd-table.tsx
 msgid "Name"
@@ -995,6 +1099,14 @@ msgstr "Одиниця виміру мережі"
 msgid "No"
 msgstr "Ні"
 
+#: src/components/routes/settings/general.tsx
+msgid "No external links yet. Click Add to create one."
+msgstr ""
+
+#: src/components/quick-links.tsx
+msgid "No quick links yet. Click + to add one."
+msgstr ""
+
 #: src/components/command-palette.tsx
 #: src/components/systemd-table/systemd-table.tsx
 msgid "No results found."
@@ -1003,6 +1115,7 @@ msgstr "Результатів не знайдено."
 #: src/components/containers-table/containers-table.tsx
 #: src/components/containers-table/containers-table.tsx
 #: src/components/containers-table/containers-table.tsx
+#: src/components/package-updates-table/package-updates-table.tsx
 #: src/components/routes/settings/alerts-history-data-table.tsx
 #: src/components/routes/system/smart-table.tsx
 #: src/components/systemd-table/systemd-table.tsx
@@ -1017,6 +1130,10 @@ msgstr "Для цього пристрою немає доступних атр�
 #: src/components/systems-table/systems-table.tsx
 msgid "No systems found."
 msgstr "Систем не знайдено."
+
+#: src/components/quick-links.tsx
+msgid "No URLs configured"
+msgstr ""
 
 #: src/components/command-palette.tsx
 #: src/components/routes/settings/layout.tsx
@@ -1060,6 +1177,18 @@ msgstr "Інше"
 #: src/components/alerts/alerts-sheet.tsx
 msgid "Overwrite existing alerts"
 msgstr "Перезаписати існуючі сповіщення"
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Package"
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Package Updates"
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Packages updated"
+msgstr ""
 
 #: src/components/command-palette.tsx
 #: src/components/command-palette.tsx
@@ -1187,6 +1316,10 @@ msgstr "Процес запущено"
 msgid "Public Key"
 msgstr "Ключ"
 
+#: src/components/quick-links.tsx
+msgid "Quick Links"
+msgstr ""
+
 #: src/components/routes/settings/quiet-hours.tsx
 msgid "Quiet Hours"
 msgstr "Тихі години"
@@ -1270,6 +1403,11 @@ msgstr "Деталі S.M.A.R.T."
 msgid "S.M.A.R.T. Self-Test"
 msgstr "Самодіагностика S.M.A.R.T."
 
+#: src/components/quick-links.tsx
+#: src/components/routes/settings/general.tsx
+msgid "Save"
+msgstr ""
+
 #: src/components/routes/settings/notifications.tsx
 msgid "Save address using enter key or comma. Leave blank to disable email notifications."
 msgstr "Збережіть адресу, використовуючи клавішу Enter або кому. Залиште порожнім, щоб вимкнути сповіщення електронною поштою."
@@ -1315,6 +1453,10 @@ msgstr "Перегляньте <0>налаштування сповіщень</0
 msgid "Select {foo}"
 msgstr ""
 
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Select all"
+msgstr ""
+
 #: src/components/routes/system.tsx
 msgid "Sent"
 msgstr "Відправлено"
@@ -1354,6 +1496,10 @@ msgstr "Увійти"
 #: src/components/command-palette.tsx
 msgid "SMTP settings"
 msgstr "Налаштування SMTP"
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Some packages failed to update"
+msgstr ""
 
 #: src/components/systems-table/systems-table.tsx
 msgid "Sort By"
@@ -1628,6 +1774,8 @@ msgid "Update"
 msgstr "Оновити"
 
 #: src/components/containers-table/containers-table-columns.tsx
+#: src/components/package-updates-table/package-updates-table.tsx
+#: src/components/package-updates-table/package-updates-table.tsx
 #: src/components/routes/system/smart-table.tsx
 #: src/components/systemd-table/systemd-table-columns.tsx
 msgid "Updated"
@@ -1637,13 +1785,22 @@ msgstr "Оновлено"
 msgid "Updated every 10 minutes."
 msgstr "Оновлюється кожні 10 хвилин."
 
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Updates"
+msgstr ""
+
 #: src/components/routes/system/network-sheet.tsx
 msgid "Upload"
 msgstr "Відвантажити"
 
 #: src/components/routes/system/info-bar.tsx
+#: src/components/systems-table/systems-table-columns.tsx
 msgid "Uptime"
 msgstr "Час роботи"
+
+#: src/components/routes/settings/general.tsx
+msgid "URL"
+msgstr ""
 
 #: src/components/routes/system.tsx
 #: src/components/routes/system.tsx

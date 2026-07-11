@@ -880,6 +880,8 @@ export default memo(function SystemDetail({ id }: { id: string }) {
 				{isLinux && compareSemVer(chartData.agentVersion, parseSemVer("0.16.0")) >= 0 && (
 					<LazySystemdTable systemId={system.id} />
 				)}
+
+				{isLinux && <LazyPackageUpdatesTable systemId={system.id} />}
 			</div>
 
 			{/* add space for tooltip if lots of sensors */}
@@ -1069,6 +1071,17 @@ function LazySystemdTable({ systemId }: { systemId: string }) {
 	return (
 		<div ref={ref} className={cn(isIntersecting && "contents")}>
 			{isIntersecting && <SystemdTable systemId={systemId} />}
+		</div>
+	)
+}
+
+const PackageUpdatesTable = lazy(() => import("../package-updates-table/package-updates-table"))
+
+function LazyPackageUpdatesTable({ systemId }: { systemId: string }) {
+	const { isIntersecting, ref } = useIntersectionObserver()
+	return (
+		<div ref={ref} className={cn(isIntersecting && "contents")}>
+			{isIntersecting && <PackageUpdatesTable systemId={systemId} />}
 		</div>
 	)
 }

@@ -9,11 +9,13 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/henrygd/beszel"
 	"github.com/henrygd/beszel/internal/alerts"
+	systemEntities "github.com/henrygd/beszel/internal/entities/system"
 	"github.com/henrygd/beszel/internal/hub/config"
 	"github.com/henrygd/beszel/internal/hub/systems"
 	"github.com/henrygd/beszel/internal/records"
@@ -26,6 +28,9 @@ import (
 	"github.com/pocketbase/pocketbase/core"
 	"golang.org/x/crypto/ssh"
 )
+
+// validPackageName mirrors the allowlist enforced by the agent and wrapper script
+var validPackageName = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9.+:_-]*$`)
 
 type Hub struct {
 	core.App
@@ -307,7 +312,71 @@ func (h *Hub) registerApiRoutes(se *core.ServeEvent) error {
 		// get container info
 		apiAuth.GET("/containers/info", h.getContainerInfo)
 	}
+
+	// extension routes (fork-specific)
+	apiExt := se.Router.Group("/api/beszel-ext")
+	apiExt.Bind(apis.RequireAuth())
+	// get available package updates for a system
+	apiExt.POST("/systems/{id}/updates/check", h.checkPackageUpdates)
+	// install selected package updates on a system
+	apiExt.POST("/systems/{id}/updates/apply", h.applyPackageUpdates)
 	return nil
+}
+
+// checkPackageUpdates handles POST /api/beszel-ext/systems/{id}/updates/check requests.
+// Body (optional): {"refresh": true} to make the agent re-check its package manager
+// instead of returning its cached list.
+func (h *Hub) checkPackageUpdates(e *core.RequestEvent) error {
+	system, err := h.sm.GetSystem(e.Request.PathValue("id"))
+	if err != nil {
+		return e.JSON(http.StatusNotFound, map[string]string{"error": "system not found"})
+	}
+
+	var body struct {
+		Refresh bool `json:"refresh"`
+	}
+	_ = e.BindBody(&body)
+
+	updates, err := system.FetchPackageUpdatesFromAgent(body.Refresh)
+	if err != nil {
+		return e.JSON(http.StatusBadGateway, map[string]string{"error": err.Error()})
+	}
+	if updates == nil {
+		updates = []systemEntities.PackageUpdate{}
+	}
+	return e.JSON(http.StatusOK, map[string]any{"updates": updates})
+}
+
+// applyPackageUpdates handles POST /api/beszel-ext/systems/{id}/updates/apply requests.
+// Body: {"packages": ["pkg1", "pkg2"]}. Returns a map of package name to error
+// message, where an empty string means the package was updated successfully.
+func (h *Hub) applyPackageUpdates(e *core.RequestEvent) error {
+	system, err := h.sm.GetSystem(e.Request.PathValue("id"))
+	if err != nil {
+		return e.JSON(http.StatusNotFound, map[string]string{"error": "system not found"})
+	}
+
+	var body struct {
+		Packages []string `json:"packages"`
+	}
+	if err := e.BindBody(&body); err != nil {
+		return e.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request body"})
+	}
+	if len(body.Packages) == 0 {
+		return e.JSON(http.StatusBadRequest, map[string]string{"error": "no packages specified"})
+	}
+	// same allowlist the agent and wrapper script enforce; fail fast at the hub
+	for _, pkg := range body.Packages {
+		if !validPackageName.MatchString(pkg) {
+			return e.JSON(http.StatusBadRequest, map[string]string{"error": "invalid package name: " + pkg})
+		}
+	}
+
+	results, err := system.ApplyPackageUpdatesOnAgent(body.Packages)
+	if err != nil {
+		return e.JSON(http.StatusBadGateway, map[string]string{"error": err.Error()})
+	}
+	return e.JSON(http.StatusOK, map[string]any{"results": results})
 }
 
 // Handler for universal token API endpoint (create, read, delete)

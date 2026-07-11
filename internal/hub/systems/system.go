@@ -499,6 +499,26 @@ func (sys *System) FetchSystemdInfoFromAgent(serviceName string) (systemd.Servic
 	return result, err
 }
 
+// FetchPackageUpdatesFromAgent fetches the list of available package updates from the agent.
+// If refresh is true the agent re-checks its package manager instead of returning cached results.
+func (sys *System) FetchPackageUpdatesFromAgent(refresh bool) ([]system.PackageUpdate, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+	defer cancel()
+	var result []system.PackageUpdate
+	err := sys.request(ctx, common.GetPackageUpdates, common.PackageUpdatesRequest{Refresh: refresh}, &result)
+	return result, err
+}
+
+// ApplyPackageUpdatesOnAgent asks the agent to install the given packages.
+// Returns a map of package name to error message, where an empty string means success.
+func (sys *System) ApplyPackageUpdatesOnAgent(packages []string) (map[string]string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Minute)
+	defer cancel()
+	var result map[string]string
+	err := sys.request(ctx, common.ApplyPackageUpdates, common.ApplyPackageUpdatesRequest{Packages: packages}, &result)
+	return result, err
+}
+
 // FetchSmartDataFromAgent fetches SMART data from the agent
 func (sys *System) FetchSmartDataFromAgent() (map[string]smart.SmartData, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)

@@ -51,6 +51,8 @@ func NewHandlerRegistry() *HandlerRegistry {
 	registry.Register(common.GetContainerInfo, &GetContainerInfoHandler{})
 	registry.Register(common.GetSmartData, &GetSmartDataHandler{})
 	registry.Register(common.GetSystemdInfo, &GetSystemdInfoHandler{})
+	registry.Register(common.GetPackageUpdates, &GetPackageUpdatesHandler{})
+	registry.Register(common.ApplyPackageUpdates, &ApplyPackageUpdatesHandler{})
 
 	return registry
 }
@@ -202,4 +204,52 @@ func (h *GetSystemdInfoHandler) Handle(hctx *HandlerContext) error {
 	}
 
 	return hctx.SendResponse(details, hctx.RequestID)
+}
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+// GetPackageUpdatesHandler returns the cached list of available package updates
+type GetPackageUpdatesHandler struct{}
+
+func (h *GetPackageUpdatesHandler) Handle(hctx *HandlerContext) error {
+	if hctx.Agent.pkgUpdateManager == nil {
+		return errors.ErrUnsupported
+	}
+
+	var req common.PackageUpdatesRequest
+	_ = cbor.Unmarshal(hctx.Request.Data, &req)
+
+	if req.Refresh {
+		if err := hctx.Agent.pkgUpdateManager.refresh(); err != nil {
+			return err
+		}
+	}
+	return hctx.SendResponse(hctx.Agent.pkgUpdateManager.getUpdates(), hctx.RequestID)
+}
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+// ApplyPackageUpdatesHandler installs the selected packages
+type ApplyPackageUpdatesHandler struct{}
+
+func (h *ApplyPackageUpdatesHandler) Handle(hctx *HandlerContext) error {
+	if hctx.Agent.pkgUpdateManager == nil {
+		return errors.ErrUnsupported
+	}
+
+	var req common.ApplyPackageUpdatesRequest
+	if err := cbor.Unmarshal(hctx.Request.Data, &req); err != nil {
+		return err
+	}
+	if len(req.Packages) == 0 {
+		return errors.New("no packages specified")
+	}
+
+	results, err := hctx.Agent.pkgUpdateManager.apply(req.Packages)
+	if err != nil {
+		return err
+	}
+	return hctx.SendResponse(results, hctx.RequestID)
 }
