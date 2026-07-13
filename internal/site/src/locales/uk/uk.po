@@ -197,6 +197,19 @@ msgstr "Всі системи"
 msgid "Apply selected"
 msgstr ""
 
+#. placeholder {0}: applying?.packages?.length ?? 0
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Applying {0} updates in the background — safe to leave this page."
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Applying updates — agent is restarting, waiting for it to come back…"
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Applying…"
+msgstr ""
+
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Are you sure you want to delete {name}?"
 msgstr "Ви впевнені, що хочете видалити {name}?"
@@ -398,6 +411,10 @@ msgstr "Перевірте журнали для отримання додатк
 
 #: src/components/package-updates-table/package-updates-table.tsx
 msgid "Check now"
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Check the agent logs for details"
 msgstr ""
 
 #: src/components/routes/settings/notifications.tsx
@@ -783,7 +800,6 @@ msgstr ""
 msgid "Fahrenheit (°F)"
 msgstr "Фаренгейт (°F)"
 
-#: src/components/package-updates-table/package-updates-table.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Failed"
 msgstr "Не вдалося"
@@ -793,8 +809,8 @@ msgid "Failed Attributes:"
 msgstr "Невдалі атрибути:"
 
 #: src/components/package-updates-table/package-updates-table.tsx
-msgid "Failed to apply updates"
-msgstr ""
+#~ msgid "Failed to apply updates"
+#~ msgstr ""
 
 #: src/lib/api.ts
 msgid "Failed to authenticate"
@@ -813,6 +829,10 @@ msgstr "Не вдалося зберегти налаштування"
 #: src/components/routes/settings/notifications.tsx
 msgid "Failed to send test notification"
 msgstr "Не вдалося надіслати тестове сповіщення"
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Failed to start update"
+msgstr ""
 
 #: src/components/alerts/alerts-sheet.tsx
 msgid "Failed to update alert"
@@ -1183,7 +1203,15 @@ msgid "Package"
 msgstr ""
 
 #: src/components/package-updates-table/package-updates-table.tsx
+msgid "Package update failed"
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
 msgid "Package Updates"
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "packages installed successfully"
 msgstr ""
 
 #: src/components/package-updates-table/package-updates-table.tsx
@@ -1498,8 +1526,8 @@ msgid "SMTP settings"
 msgstr "Налаштування SMTP"
 
 #: src/components/package-updates-table/package-updates-table.tsx
-msgid "Some packages failed to update"
-msgstr ""
+#~ msgid "Some packages failed to update"
+#~ msgstr ""
 
 #: src/components/systems-table/systems-table.tsx
 msgid "Sort By"
@@ -1774,8 +1802,6 @@ msgid "Update"
 msgstr "Оновити"
 
 #: src/components/containers-table/containers-table-columns.tsx
-#: src/components/package-updates-table/package-updates-table.tsx
-#: src/components/package-updates-table/package-updates-table.tsx
 #: src/components/routes/system/smart-table.tsx
 #: src/components/systemd-table/systemd-table-columns.tsx
 msgid "Updated"

@@ -130,7 +130,7 @@ func NewAgent(dataDir ...string) (agent *Agent, err error) {
 		slog.Debug("Systemd", "err", err)
 	}
 
-	agent.pkgUpdateManager = newPkgUpdateManager()
+	agent.pkgUpdateManager = newPkgUpdateManager(agent.dataDir)
 
 	agent.smartManager, err = NewSmartManager()
 	if err != nil {

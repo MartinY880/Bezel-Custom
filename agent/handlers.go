@@ -53,6 +53,7 @@ func NewHandlerRegistry() *HandlerRegistry {
 	registry.Register(common.GetSystemdInfo, &GetSystemdInfoHandler{})
 	registry.Register(common.GetPackageUpdates, &GetPackageUpdatesHandler{})
 	registry.Register(common.ApplyPackageUpdates, &ApplyPackageUpdatesHandler{})
+	registry.Register(common.GetPackageUpdateStatus, &GetPackageUpdateStatusHandler{})
 
 	return registry
 }
@@ -231,7 +232,9 @@ func (h *GetPackageUpdatesHandler) Handle(hctx *HandlerContext) error {
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
-// ApplyPackageUpdatesHandler installs the selected packages
+// ApplyPackageUpdatesHandler starts a background install of the selected
+// packages and responds immediately with the job status. Poll with
+// GetPackageUpdateStatus for the outcome.
 type ApplyPackageUpdatesHandler struct{}
 
 func (h *ApplyPackageUpdatesHandler) Handle(hctx *HandlerContext) error {
@@ -247,9 +250,22 @@ func (h *ApplyPackageUpdatesHandler) Handle(hctx *HandlerContext) error {
 		return errors.New("no packages specified")
 	}
 
-	results, err := hctx.Agent.pkgUpdateManager.apply(req.Packages)
+	status, err := hctx.Agent.pkgUpdateManager.startApply(req.Packages)
 	if err != nil {
 		return err
 	}
-	return hctx.SendResponse(results, hctx.RequestID)
+	return hctx.SendResponse(status, hctx.RequestID)
+}
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+// GetPackageUpdateStatusHandler reports the current/last background apply job
+type GetPackageUpdateStatusHandler struct{}
+
+func (h *GetPackageUpdateStatusHandler) Handle(hctx *HandlerContext) error {
+	if hctx.Agent.pkgUpdateManager == nil {
+		return errors.ErrUnsupported
+	}
+	return hctx.SendResponse(hctx.Agent.pkgUpdateManager.applyStatus(), hctx.RequestID)
 }

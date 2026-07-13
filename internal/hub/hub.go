@@ -325,8 +325,10 @@ func (h *Hub) registerApiRoutes(se *core.ServeEvent) error {
 	apiExt.Bind(apis.RequireAuth())
 	// get available package updates for a system
 	apiExt.POST("/systems/{id}/updates/check", h.checkPackageUpdates)
-	// install selected package updates on a system
+	// start installing selected package updates on a system (background job)
 	apiExt.POST("/systems/{id}/updates/apply", h.applyPackageUpdates)
+	// poll the status of a background apply job
+	apiExt.GET("/systems/{id}/updates/status", h.packageUpdateStatus)
 
 	// fork: hub-served agent installer + binaries. Unauthenticated because the
 	// target host has no hub credentials yet; neither the script nor the binary
@@ -388,12 +390,29 @@ func (h *Hub) applyPackageUpdates(e *core.RequestEvent) error {
 		}
 	}
 
-	results, err := system.ApplyPackageUpdatesOnAgent(body.Packages)
+	status, err := system.ApplyPackageUpdatesOnAgent(body.Packages)
 	if err != nil {
-		// Surface the real reason (e.g. timeout) in the "message" field the SDK reads.
+		// Surface the real reason in the "message" field the SDK reads.
 		return apis.NewApiError(http.StatusBadGateway, "agent apply failed: "+err.Error(), nil)
 	}
-	return e.JSON(http.StatusOK, map[string]any{"results": results})
+	// 202: the install runs in the background on the agent; poll /updates/status
+	return e.JSON(http.StatusAccepted, status)
+}
+
+// packageUpdateStatus handles GET /api/beszel-ext/systems/{id}/updates/status.
+// Returns the agent's current/last background apply job state.
+func (h *Hub) packageUpdateStatus(e *core.RequestEvent) error {
+	system, err := h.sm.GetSystem(e.Request.PathValue("id"))
+	if err != nil {
+		return e.NotFoundError("system not found", nil)
+	}
+	status, err := system.FetchPackageUpdateStatusFromAgent()
+	if err != nil {
+		// The agent can briefly drop its connection mid-upgrade (service restarts).
+		// Report that distinctly so the UI can keep polling instead of failing.
+		return e.JSON(http.StatusOK, map[string]any{"status": "unreachable", "message": err.Error()})
+	}
+	return e.JSON(http.StatusOK, status)
 }
 
 // Handler for universal token API endpoint (create, read, delete)

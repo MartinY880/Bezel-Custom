@@ -1,7 +1,7 @@
 import { t } from "@lingui/core/macro"
 import { Trans } from "@lingui/react/macro"
 import { DownloadIcon, LoaderCircleIcon, RefreshCwIcon } from "lucide-react"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -12,13 +12,25 @@ import { pb } from "@/lib/api"
 import { cn } from "@/lib/utils"
 import type { PackageUpdate } from "@/types"
 
+interface ApplyStatus {
+	status: "idle" | "running" | "done" | "failed" | "unreachable"
+	packages?: string[]
+	message?: string
+	startedAt?: number
+	finishedAt?: number
+}
+
+const POLL_INTERVAL = 5_000
+
 export default function PackageUpdatesTable({ systemId }: { systemId: string }) {
 	const [updates, setUpdates] = useState<PackageUpdate[] | null>(null)
 	const [selected, setSelected] = useState<Set<string>>(new Set())
 	const [checking, setChecking] = useState(false)
-	const [applying, setApplying] = useState(false)
+	const [applying, setApplying] = useState<ApplyStatus | null>(null)
 	const [unsupported, setUnsupported] = useState(false)
 	const [filter, setFilter] = useState("")
+	// job completions already announced, so re-polls don't re-toast
+	const announcedJob = useRef<number>(0)
 
 	const fetchUpdates = useCallback(
 		async (refresh: boolean) => {
@@ -27,6 +39,7 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 				{
 					method: "POST",
 					body: { refresh },
+					requestKey: null,
 				}
 			)
 			setUpdates(updates ?? [])
@@ -38,16 +51,78 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 		[systemId]
 	)
 
-	// initial load returns the agent's cached list (fast)
+	// initial load: cached list + resume watching any in-flight apply
 	useEffect(() => {
 		setUpdates(null)
 		setSelected(new Set())
 		setUnsupported(false)
+		setApplying(null)
+		announcedJob.current = 0
+
 		fetchUpdates(false).catch(() => {
 			// agent doesn't support package updates (old version / no package manager)
 			setUnsupported(true)
 		})
-	}, [fetchUpdates])
+
+		pb.send<ApplyStatus>(`/api/beszel-ext/systems/${systemId}/updates/status`, {
+			method: "GET",
+			requestKey: null,
+		})
+			.then((status) => {
+				if (status.status === "running") {
+					// an apply started earlier is still going — resume showing it
+					announcedJob.current = status.startedAt ?? 0
+					setApplying(status)
+				}
+			})
+			.catch(() => {})
+	}, [systemId, fetchUpdates])
+
+	// poll job status while an apply is running
+	useEffect(() => {
+		if (applying?.status !== "running" && applying?.status !== "unreachable") {
+			return
+		}
+		const id = setInterval(async () => {
+			try {
+				const status = await pb.send<ApplyStatus>(`/api/beszel-ext/systems/${systemId}/updates/status`, {
+					method: "GET",
+					requestKey: null,
+				})
+				if (status.status === "running") {
+					setApplying(status)
+					return
+				}
+				if (status.status === "unreachable") {
+					// agent briefly offline mid-upgrade (service restarts) — keep waiting
+					setApplying((cur) => ({ ...(cur ?? status), status: "unreachable" }))
+					return
+				}
+				// job finished (done/failed) or agent restarted with no job (idle)
+				setApplying(null)
+				const jobKey = status.finishedAt ?? Date.now()
+				if (announcedJob.current !== jobKey) {
+					announcedJob.current = jobKey
+					if (status.status === "done") {
+						toast({
+							title: t`Packages updated`,
+							description: `${status.packages?.length ?? ""} ${t`packages installed successfully`}`,
+						})
+					} else if (status.status === "failed") {
+						toast({
+							title: t`Package update failed`,
+							description: status.message ?? t`Check the agent logs for details`,
+						})
+					}
+				}
+				setSelected(new Set())
+				fetchUpdates(false).catch(() => {})
+			} catch {
+				// hub unreachable — keep the polling loop alive
+			}
+		}, POLL_INTERVAL)
+		return () => clearInterval(id)
+	}, [applying?.status, systemId, fetchUpdates])
 
 	const checkNow = useCallback(async () => {
 		setChecking(true)
@@ -68,44 +143,21 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 		if (!packages.length) {
 			return
 		}
-		setApplying(true)
 		try {
-			const { results } = await pb.send<{ results: Record<string, string> }>(
-				`/api/beszel-ext/systems/${systemId}/updates/apply`,
-				{
-					method: "POST",
-					body: { packages },
-					// applying updates can take a while
-					requestKey: null,
-				}
-			)
-			const failed = Object.entries(results ?? {}).filter(([, msg]) => msg !== "")
-			const okCount = packages.length - failed.length
-			if (failed.length) {
-				toast({
-					title: t`Some packages failed to update`,
-					description: `${t`Updated`}: ${okCount}. ${t`Failed`}: ${failed
-						.map(([name, msg]) => `${name} (${msg})`)
-						.join(", ")}`,
-				})
-			} else {
-				toast({
-					title: t`Packages updated`,
-					description: `${t`Updated`}: ${packages.join(", ")}`,
-				})
-			}
-			setSelected(new Set())
-			// agent re-checks after applying, so its cached list is already fresh
-			await fetchUpdates(false)
+			const status = await pb.send<ApplyStatus>(`/api/beszel-ext/systems/${systemId}/updates/apply`, {
+				method: "POST",
+				body: { packages },
+				requestKey: null,
+			})
+			announcedJob.current = 0
+			setApplying(status.status ? status : { status: "running", packages })
 		} catch (error: any) {
 			toast({
 				title: t`Error`,
-				description: error?.message ?? t`Failed to apply updates`,
+				description: error?.message ?? t`Failed to start update`,
 			})
-		} finally {
-			setApplying(false)
 		}
-	}, [systemId, selected, fetchUpdates])
+	}, [systemId, selected])
 
 	const filteredUpdates = useMemo(() => {
 		if (!updates) {
@@ -153,6 +205,8 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 		return null
 	}
 
+	const isApplying = applying?.status === "running" || applying?.status === "unreachable"
+
 	return (
 		<Card className="p-6 @container w-full">
 			<CardHeader className="p-0 mb-4">
@@ -162,7 +216,18 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 							<Trans>Package Updates</Trans>
 						</CardTitle>
 						<CardDescription>
-							{updates.length ? (
+							{isApplying ? (
+								<span className="flex items-center gap-1.5">
+									<LoaderCircleIcon className="size-3.5 animate-spin" />
+									{applying?.status === "unreachable" ? (
+										<Trans>Applying updates — agent is restarting, waiting for it to come back…</Trans>
+									) : (
+										<Trans>
+											Applying {applying?.packages?.length ?? 0} updates in the background — safe to leave this page.
+										</Trans>
+									)}
+								</span>
+							) : updates.length ? (
 								<Trans>
 									Available: {updates.length}. Nothing is installed without your explicit approval.
 								</Trans>
@@ -180,7 +245,7 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 								className="px-4 w-full max-w-full md:w-52"
 							/>
 						)}
-						<Button variant="outline" size="sm" onClick={checkNow} disabled={checking || applying}>
+						<Button variant="outline" size="sm" onClick={checkNow} disabled={checking || isApplying}>
 							{checking ? (
 								<LoaderCircleIcon className="size-4 me-1.5 animate-spin" />
 							) : (
@@ -189,20 +254,26 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 							<Trans>Check now</Trans>
 						</Button>
 						{updates.length > 0 && (
-							<Button size="sm" onClick={applySelected} disabled={applying || checking || selected.size === 0}>
-								{applying ? (
+							<Button size="sm" onClick={applySelected} disabled={isApplying || checking || selected.size === 0}>
+								{isApplying ? (
 									<LoaderCircleIcon className="size-4 me-1.5 animate-spin" />
 								) : (
 									<DownloadIcon className="size-4 me-1.5" />
 								)}
-								<Trans>Apply selected</Trans> ({selected.size})
+								{isApplying ? <Trans>Applying…</Trans> : <Trans>Apply selected</Trans>}
+								{!isApplying && ` (${selected.size})`}
 							</Button>
 						)}
 					</div>
 				</div>
 			</CardHeader>
 			{updates.length > 0 && (
-				<div className={cn("max-h-[calc(100dvh-17rem)] relative overflow-auto border rounded-md", applying && "opacity-60 pointer-events-none")}>
+				<div
+					className={cn(
+						"max-h-[calc(100dvh-17rem)] relative overflow-auto border rounded-md",
+						isApplying && "opacity-60 pointer-events-none"
+					)}
+				>
 					<Table className="text-sm w-full text-nowrap">
 						<TableHeader className="sticky top-0 z-10 bg-card">
 							<TableRow>

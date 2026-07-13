@@ -26,6 +26,8 @@ const (
 	GetPackageUpdates
 	// Install selected OS package updates on agent
 	ApplyPackageUpdates
+	// Request status of a background package-update apply job
+	GetPackageUpdateStatus
 	// Add new actions here...
 )
 
@@ -85,4 +87,23 @@ type PackageUpdatesRequest struct {
 
 type ApplyPackageUpdatesRequest struct {
 	Packages []string `cbor:"0,keyasint"`
+}
+
+// Package apply job states reported in PackageApplyStatus.Status
+const (
+	PkgApplyIdle    = "idle"    // no apply has run since agent start
+	PkgApplyRunning = "running" // install in progress
+	PkgApplyDone    = "done"    // last apply finished successfully
+	PkgApplyFailed  = "failed"  // last apply exited non-zero or was interrupted
+)
+
+// PackageApplyStatus describes the state of a background package-update apply.
+// ApplyPackageUpdates responds with this immediately (Status=running) and
+// GetPackageUpdateStatus returns the current/last job state.
+type PackageApplyStatus struct {
+	Status     string   `json:"status" cbor:"0,keyasint"`
+	Packages   []string `json:"packages,omitempty" cbor:"1,keyasint,omitempty"`
+	Message    string   `json:"message,omitempty" cbor:"2,keyasint,omitempty"` // error detail / log tail on failure
+	StartedAt  int64    `json:"startedAt,omitempty" cbor:"3,keyasint,omitempty"`
+	FinishedAt int64    `json:"finishedAt,omitempty" cbor:"4,keyasint,omitempty"`
 }

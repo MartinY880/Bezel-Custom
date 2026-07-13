@@ -509,13 +509,24 @@ func (sys *System) FetchPackageUpdatesFromAgent(refresh bool) ([]system.PackageU
 	return result, err
 }
 
-// ApplyPackageUpdatesOnAgent asks the agent to install the given packages.
-// Returns a map of package name to error message, where an empty string means success.
-func (sys *System) ApplyPackageUpdatesOnAgent(packages []string) (map[string]string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Minute)
+// ApplyPackageUpdatesOnAgent asks the agent to start installing the given
+// packages in the background. The agent acks immediately with the job status;
+// poll FetchPackageUpdateStatusFromAgent for the outcome.
+func (sys *System) ApplyPackageUpdatesOnAgent(packages []string) (common.PackageApplyStatus, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	var result map[string]string
+	var result common.PackageApplyStatus
 	err := sys.request(ctx, common.ApplyPackageUpdates, common.ApplyPackageUpdatesRequest{Packages: packages}, &result)
+	return result, err
+}
+
+// FetchPackageUpdateStatusFromAgent returns the agent's current/last
+// background apply job state.
+func (sys *System) FetchPackageUpdateStatusFromAgent() (common.PackageApplyStatus, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	var result common.PackageApplyStatus
+	err := sys.request(ctx, common.GetPackageUpdateStatus, nil, &result)
 	return result, err
 }
 
