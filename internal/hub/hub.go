@@ -271,6 +271,13 @@ func (h *Hub) registerMiddlewares(se *core.ServeEvent) {
 
 // custom api routes
 func (h *Hub) registerApiRoutes(se *core.ServeEvent) error {
+	// Package-update applies can install many packages within a single request,
+	// which can easily exceed PocketBase's default 5m server WriteTimeout and
+	// get the connection cut off mid-apply. Raise it so large batches complete.
+	if se.Server != nil {
+		se.Server.WriteTimeout = 30 * time.Minute
+	}
+
 	// auth protected routes
 	apiAuth := se.Router.Group("/api/beszel")
 	apiAuth.Bind(apis.RequireAuth())
@@ -336,7 +343,7 @@ func (h *Hub) registerApiRoutes(se *core.ServeEvent) error {
 func (h *Hub) checkPackageUpdates(e *core.RequestEvent) error {
 	system, err := h.sm.GetSystem(e.Request.PathValue("id"))
 	if err != nil {
-		return e.JSON(http.StatusNotFound, map[string]string{"error": "system not found"})
+		return e.NotFoundError("system not found", nil)
 	}
 
 	var body struct {
@@ -346,7 +353,9 @@ func (h *Hub) checkPackageUpdates(e *core.RequestEvent) error {
 
 	updates, err := system.FetchPackageUpdatesFromAgent(body.Refresh)
 	if err != nil {
-		return e.JSON(http.StatusBadGateway, map[string]string{"error": err.Error()})
+		// Surface the real reason (ApiError puts it in the "message" field the
+		// frontend SDK reads; a plain {"error":...} shows as "Something went wrong").
+		return apis.NewApiError(http.StatusBadGateway, "agent request failed: "+err.Error(), nil)
 	}
 	if updates == nil {
 		updates = []systemEntities.PackageUpdate{}
@@ -360,28 +369,29 @@ func (h *Hub) checkPackageUpdates(e *core.RequestEvent) error {
 func (h *Hub) applyPackageUpdates(e *core.RequestEvent) error {
 	system, err := h.sm.GetSystem(e.Request.PathValue("id"))
 	if err != nil {
-		return e.JSON(http.StatusNotFound, map[string]string{"error": "system not found"})
+		return e.NotFoundError("system not found", nil)
 	}
 
 	var body struct {
 		Packages []string `json:"packages"`
 	}
 	if err := e.BindBody(&body); err != nil {
-		return e.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request body"})
+		return e.BadRequestError("invalid request body", nil)
 	}
 	if len(body.Packages) == 0 {
-		return e.JSON(http.StatusBadRequest, map[string]string{"error": "no packages specified"})
+		return e.BadRequestError("no packages specified", nil)
 	}
 	// same allowlist the agent and wrapper script enforce; fail fast at the hub
 	for _, pkg := range body.Packages {
 		if !validPackageName.MatchString(pkg) {
-			return e.JSON(http.StatusBadRequest, map[string]string{"error": "invalid package name: " + pkg})
+			return e.BadRequestError("invalid package name: "+pkg, nil)
 		}
 	}
 
 	results, err := system.ApplyPackageUpdatesOnAgent(body.Packages)
 	if err != nil {
-		return e.JSON(http.StatusBadGateway, map[string]string{"error": err.Error()})
+		// Surface the real reason (e.g. timeout) in the "message" field the SDK reads.
+		return apis.NewApiError(http.StatusBadGateway, "agent apply failed: "+err.Error(), nil)
 	}
 	return e.JSON(http.StatusOK, map[string]any{"results": results})
 }

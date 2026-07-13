@@ -360,6 +360,12 @@ func (pm *pkgUpdateManager) apply(packages []string) (map[string]string, error) 
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
 	defer cancel()
 
+	// Only fall back to per-package isolation for smallish batches. For large
+	// selections, retrying each package individually could mean dozens of
+	// sequential installs and blow past the timeout, so just report the batch
+	// error against every package instead.
+	const maxIsolationRetry = 25
+
 	results := make(map[string]string, len(packages))
 	output, err := pm.runApply(ctx, packages)
 	switch {
@@ -369,6 +375,12 @@ func (pm *pkgUpdateManager) apply(packages []string) (map[string]string, error) 
 		}
 	case len(packages) == 1:
 		results[packages[0]] = applyErrorMessage(err, output)
+	case len(packages) > maxIsolationRetry:
+		// too many to isolate cheaply; attribute the batch failure to all
+		msg := applyErrorMessage(err, output)
+		for _, pkg := range packages {
+			results[pkg] = msg
+		}
 	default:
 		// combined install failed; retry one at a time to isolate failures
 		for _, pkg := range packages {
