@@ -320,6 +320,13 @@ func (h *Hub) registerApiRoutes(se *core.ServeEvent) error {
 	apiExt.POST("/systems/{id}/updates/check", h.checkPackageUpdates)
 	// install selected package updates on a system
 	apiExt.POST("/systems/{id}/updates/apply", h.applyPackageUpdates)
+
+	// fork: hub-served agent installer + binaries. Unauthenticated because the
+	// target host has no hub credentials yet; neither the script nor the binary
+	// is secret. Static paths, so the radix router matches them ahead of the
+	// SPA catch-all GET /{path...}.
+	se.Router.GET("/install-agent.sh", h.serveInstallAgentScript)
+	se.Router.GET("/agent-download", h.serveAgentBinary)
 	return nil
 }
 

@@ -1,4 +1,3 @@
-import { i18n } from "@lingui/core"
 import { memo } from "react"
 import { copyToClipboard, getHubURL } from "@/lib/utils"
 import { DropdownMenuContent, DropdownMenuItem } from "./ui/dropdown-menu"
@@ -22,10 +21,17 @@ const getScriptUrl = (path: string = "") => {
 	// return url.toString()
 }
 
+// Fork: Docker image to use for agents. This must point at an image built from
+// THIS fork for the package-update feature to be present. Default is upstream
+// (non-breaking); change to your published fork image, e.g.
+// "ghcr.io/martiny880/mydashbeszel/beszel-agent", after building/pushing it via
+// the docker-images.yml workflow, then rebuild the hub.
+const AGENT_IMAGE = "henrygd/beszel-agent"
+
 export function copyDockerCompose(port = "45876", publicKey: string, token: string) {
 	copyToClipboard(`services:
   beszel-agent:
-    image: henrygd/beszel-agent
+    image: ${AGENT_IMAGE}
     container_name: beszel-agent
     restart: unless-stopped
     network_mode: host
@@ -43,19 +49,24 @@ export function copyDockerCompose(port = "45876", publicKey: string, token: stri
 
 export function copyDockerRun(port = "45876", publicKey: string, token: string) {
 	copyToClipboard(
-		`docker run -d --name beszel-agent --network host --restart unless-stopped -v /var/run/docker.sock:/var/run/docker.sock:ro -v ./beszel_agent_data:/var/lib/beszel-agent -e KEY="${publicKey}" -e LISTEN=${port} -e TOKEN="${token}" -e HUB_URL="${getHubURL()}" henrygd/beszel-agent`
+		`docker run -d --name beszel-agent --network host --restart unless-stopped -v /var/run/docker.sock:/var/run/docker.sock:ro -v ./beszel_agent_data:/var/lib/beszel-agent -e KEY="${publicKey}" -e LISTEN=${port} -e TOKEN="${token}" -e HUB_URL="${getHubURL()}" ${AGENT_IMAGE}`
 	)
 }
 
 export function copyLinuxCommand(port = "45876", publicKey: string, token: string, brew = false) {
-	let cmd = `curl -sL ${getScriptUrl(
-		brew ? "/brew" : ""
-	)} -o /tmp/install-agent.sh && chmod +x /tmp/install-agent.sh && /tmp/install-agent.sh -p ${port} -k "${publicKey}" -t "${token}" -url "${getHubURL()}"`
-	// brew script does not support --china-mirrors
-	if (!brew && (i18n.locale + navigator.language).includes("zh-CN")) {
-		cmd += ` --china-mirrors`
+	// brew (macOS) still uses the upstream installer; the fork hosts only the
+	// Linux native installer, served from the hub itself so it deploys THIS
+	// fork's agent (with the package-update feature).
+	if (brew) {
+		copyToClipboard(
+			`curl -sL ${getScriptUrl("/brew")} -o /tmp/install-agent.sh && chmod +x /tmp/install-agent.sh && /tmp/install-agent.sh -p ${port} -k "${publicKey}" -t "${token}" -url "${getHubURL()}"`
+		)
+		return
 	}
-	copyToClipboard(cmd)
+	// The install script self-elevates via sudo if not already root.
+	copyToClipboard(
+		`curl -sL ${getHubURL()}/install-agent.sh -o /tmp/install-agent.sh && chmod +x /tmp/install-agent.sh && /tmp/install-agent.sh -p ${port} -k "${publicKey}" -t "${token}" -url "${getHubURL()}"`
+	)
 }
 
 export function copyWindowsCommand(port = "45876", publicKey: string, token: string) {
