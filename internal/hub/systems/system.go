@@ -555,6 +555,16 @@ func (sys *System) ApplyPackageUpdatesOnAgent(packages []string) (common.Package
 	return common.PackageApplyStatus{}, errors.New("unrecognized apply response from agent")
 }
 
+// UpdateAgentFromHub tells the agent to download the staged fork binary from
+// the hub, verify it against checksums (arch -> sha256), and restart itself.
+func (sys *System) UpdateAgentFromHub(hubURL string, checksums map[string]string) (common.AgentUpdateResponse, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+	defer cancel()
+	var result common.AgentUpdateResponse
+	err := sys.request(ctx, common.UpdateAgent, common.AgentUpdateRequest{URL: hubURL, Checksums: checksums}, &result)
+	return result, err
+}
+
 // FetchPackageUpdateStatusFromAgent returns the agent's current/last
 // background apply job state.
 func (sys *System) FetchPackageUpdateStatusFromAgent() (common.PackageApplyStatus, error) {

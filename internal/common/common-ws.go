@@ -28,6 +28,8 @@ const (
 	ApplyPackageUpdates
 	// Request status of a background package-update apply job
 	GetPackageUpdateStatus
+	// Tell the agent to download the fork binary from the hub and self-update
+	UpdateAgent
 	// Add new actions here...
 )
 
@@ -96,6 +98,21 @@ const (
 	PkgApplyDone    = "done"    // last apply finished successfully
 	PkgApplyFailed  = "failed"  // last apply exited non-zero or was interrupted
 )
+
+// AgentUpdateRequest tells an agent to replace its binary with the one the
+// hub serves at URL/agent-download?arch=<GOARCH> and restart. Checksums maps
+// arch -> sha256 hex of the staged binary, so the agent can verify the
+// download and skip the swap when already up to date.
+type AgentUpdateRequest struct {
+	URL       string            `cbor:"0,keyasint"`
+	Checksums map[string]string `cbor:"1,keyasint"`
+}
+
+// AgentUpdateResponse reports the outcome of an UpdateAgent request.
+type AgentUpdateResponse struct {
+	Updated bool   `json:"updated" cbor:"0,keyasint"`
+	Message string `json:"message,omitempty" cbor:"1,keyasint,omitempty"`
+}
 
 // PackageApplyStatus describes the state of a background package-update apply.
 // ApplyPackageUpdates responds with this immediately (Status=running) and

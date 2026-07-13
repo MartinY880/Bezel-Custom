@@ -11,6 +11,7 @@ import {
 	ClockArrowUp,
 	CopyIcon,
 	CpuIcon,
+	DownloadIcon,
 	HardDriveIcon,
 	MemoryStickIcon,
 	MoreHorizontalIcon,
@@ -55,6 +56,7 @@ import {
 } from "../ui/alert-dialog"
 import { Button, buttonVariants } from "../ui/button"
 import { Dialog } from "../ui/dialog"
+import { toast } from "../ui/use-toast"
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -679,6 +681,27 @@ export const ActionsButton = memo(({ system }: { system: SystemRecord }) => {
 						<DropdownMenuItem onClick={() => copyToClipboard(host)}>
 							<CopyIcon className="me-2.5 size-4" />
 							<Trans>Copy host</Trans>
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							className={cn((isReadOnlyUser() || status !== SystemStatus.Up) && "hidden")}
+							onClick={async () => {
+								toast({ description: t`Pushing agent update to ${name}...` })
+								try {
+									const res = await pb.send<{ updated: boolean; message?: string }>(
+										`/api/beszel-ext/systems/${id}/agent/update`,
+										{ method: "POST", requestKey: null }
+									)
+									toast({
+										title: res.updated ? t`Agent updating` : t`Agent up to date`,
+										description: res.message,
+									})
+								} catch (error: any) {
+									toast({ title: t`Agent update failed`, description: error?.message })
+								}
+							}}
+						>
+							<DownloadIcon className="me-2.5 size-4" />
+							<Trans>Update agent</Trans>
 						</DropdownMenuItem>
 						<DropdownMenuSeparator className={cn(isReadOnlyUser() && "hidden")} />
 						<DropdownMenuItem className={cn(isReadOnlyUser() && "hidden")} onSelect={() => setDeleteOpen(true)}>

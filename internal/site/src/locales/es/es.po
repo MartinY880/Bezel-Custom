@@ -162,6 +162,18 @@ msgstr "Después"
 msgid "Agent"
 msgstr "Agente"
 
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Agent up to date"
+msgstr ""
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Agent update failed"
+msgstr ""
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Agent updating"
+msgstr ""
+
 #: src/components/command-palette.tsx
 #: src/components/routes/settings/alerts-history-data-table.tsx
 #: src/components/routes/settings/layout.tsx
@@ -1348,6 +1360,10 @@ msgstr "Proceso iniciado"
 msgid "Public Key"
 msgstr "Clave pública"
 
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Pushing agent update to {name}..."
+msgstr ""
+
 #: src/components/quick-links.tsx
 msgid "Quick Links"
 msgstr ""
@@ -1804,6 +1820,10 @@ msgstr "Activo ({upSystemsLength})"
 #: src/components/routes/settings/quiet-hours.tsx
 msgid "Update"
 msgstr "Actualizar"
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Update agent"
+msgstr ""
 
 #: src/components/containers-table/containers-table-columns.tsx
 #: src/components/routes/system/smart-table.tsx

@@ -54,6 +54,7 @@ func NewHandlerRegistry() *HandlerRegistry {
 	registry.Register(common.GetPackageUpdates, &GetPackageUpdatesHandler{})
 	registry.Register(common.ApplyPackageUpdates, &ApplyPackageUpdatesHandler{})
 	registry.Register(common.GetPackageUpdateStatus, &GetPackageUpdateStatusHandler{})
+	registry.Register(common.UpdateAgent, &UpdateAgentHandler{})
 
 	return registry
 }
@@ -268,4 +269,23 @@ func (h *GetPackageUpdateStatusHandler) Handle(hctx *HandlerContext) error {
 		return errors.ErrUnsupported
 	}
 	return hctx.SendResponse(hctx.Agent.pkgUpdateManager.applyStatus(), hctx.RequestID)
+}
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+// UpdateAgentHandler downloads the fork binary from the hub, swaps it over
+// the running executable, and restarts the agent
+type UpdateAgentHandler struct{}
+
+func (h *UpdateAgentHandler) Handle(hctx *HandlerContext) error {
+	var req common.AgentUpdateRequest
+	if err := cbor.Unmarshal(hctx.Request.Data, &req); err != nil {
+		return err
+	}
+	result, err := selfUpdateFromHub(req)
+	if err != nil {
+		return err
+	}
+	return hctx.SendResponse(result, hctx.RequestID)
 }

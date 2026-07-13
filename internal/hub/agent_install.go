@@ -1,11 +1,15 @@
 package hub
 
 import (
+	"crypto/sha256"
 	_ "embed"
+	"encoding/hex"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 
+	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
 )
 
@@ -28,6 +32,47 @@ var allowedAgentArch = map[string]bool{"amd64": true, "arm64": true}
 func (h *Hub) serveInstallAgentScript(e *core.RequestEvent) error {
 	e.Response.Header().Set("Content-Type", "text/x-shellscript; charset=utf-8")
 	return e.String(http.StatusOK, installAgentScript)
+}
+
+// stagedAgentChecksums returns arch -> sha256 hex for the agent binaries
+// staged in <dataDir>/agents. Arches with no staged binary are omitted.
+func (h *Hub) stagedAgentChecksums() map[string]string {
+	sums := make(map[string]string, len(allowedAgentArch))
+	for arch := range allowedAgentArch {
+		f, err := os.Open(filepath.Join(h.DataDir(), "agents", "beszel-agent_linux_"+arch))
+		if err != nil {
+			continue
+		}
+		hash := sha256.New()
+		if _, err := io.Copy(hash, f); err == nil {
+			sums[arch] = hex.EncodeToString(hash.Sum(nil))
+		}
+		f.Close()
+	}
+	return sums
+}
+
+// updateAgent handles POST /api/beszel-ext/systems/{id}/agent/update.
+// Tells the agent to fetch the staged fork binary from this hub and restart.
+func (h *Hub) updateAgent(e *core.RequestEvent) error {
+	system, err := h.sm.GetSystem(e.Request.PathValue("id"))
+	if err != nil {
+		return e.NotFoundError("system not found", nil)
+	}
+	checksums := h.stagedAgentChecksums()
+	if len(checksums) == 0 {
+		return apis.NewApiError(http.StatusServiceUnavailable, "no agent binaries staged on the hub (data dir /agents)", nil)
+	}
+	result, err := system.UpdateAgentFromHub(h.appURL, checksums)
+	if err != nil {
+		msg := err.Error()
+		// old fork agents don't know the UpdateAgent action
+		if len(msg) > 0 && (msg == "unknown action: 9" || msg == "unsupported operation") {
+			msg = "this agent is too old for remote update - reinstall it once with the Add System command"
+		}
+		return apis.NewApiError(http.StatusBadGateway, "agent update failed: "+msg, nil)
+	}
+	return e.JSON(http.StatusOK, result)
 }
 
 // serveAgentBinary serves the fork agent binary for a given arch from
