@@ -46,6 +46,9 @@ func (h *Hub) startServer(se *core.ServeEvent) error {
 			e.Response.Header().Del("X-Frame-Options")
 			e.Response.Header().Set("Content-Security-Policy", csp)
 		}
+		// index.html must revalidate so UI updates apply without a hard refresh
+		// (asset filenames are hashed, so this only affects the html shell)
+		e.Response.Header().Set("Cache-Control", "no-cache")
 		return e.HTML(http.StatusOK, html)
 	})
 	return nil

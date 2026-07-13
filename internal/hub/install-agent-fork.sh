@@ -65,6 +65,15 @@ if [ -z "$HUB_URL" ]; then
   exit 1
 fi
 
+# catch literal placeholders / mangled copy-paste before they wreck a working config
+case "$KEY" in
+  ssh-*) ;;
+  *) echo "Error: -k must be the hub's SSH public key (starts with \"ssh-\"). Copy the real command from the hub's Add System dialog." >&2; exit 1 ;;
+esac
+case "$TOKEN" in
+  ""|*"<"*|*">"*) echo "Error: -t must be a real token, not a placeholder. Copy the real command from the hub's Add System dialog." >&2; exit 1 ;;
+esac
+
 # Installing a service needs root. Self-elevate so the copied command works
 # whether the target shell is root (common on LXCs) or not. Alpine typically
 # ships doas rather than sudo.
