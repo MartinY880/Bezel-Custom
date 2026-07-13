@@ -409,6 +409,7 @@ msgid "Check now"
 msgstr "Check now"
 
 #: src/components/package-updates-table/package-updates-table.tsx
+#: src/components/package-updates-table/package-updates-table.tsx
 msgid "Check the agent logs for details"
 msgstr "Check the agent logs for details"
 
@@ -1198,6 +1199,7 @@ msgid "Package"
 msgstr "Package"
 
 #: src/components/package-updates-table/package-updates-table.tsx
+#: src/components/package-updates-table/package-updates-table.tsx
 msgid "Package update failed"
 msgstr "Package update failed"
 
@@ -1206,9 +1208,11 @@ msgid "Package Updates"
 msgstr "Package Updates"
 
 #: src/components/package-updates-table/package-updates-table.tsx
+#: src/components/package-updates-table/package-updates-table.tsx
 msgid "packages installed successfully"
 msgstr "packages installed successfully"
 
+#: src/components/package-updates-table/package-updates-table.tsx
 #: src/components/package-updates-table/package-updates-table.tsx
 msgid "Packages updated"
 msgstr "Packages updated"

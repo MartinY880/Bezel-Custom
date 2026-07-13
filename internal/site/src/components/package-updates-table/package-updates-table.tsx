@@ -149,6 +149,19 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 				body: { packages },
 				requestKey: null,
 			})
+			// legacy (pre-async) agents apply synchronously and return a final
+			// result right away — report it instead of polling
+			if (status.status === "done" || status.status === "failed") {
+				announcedJob.current = status.finishedAt ?? Date.now()
+				if (status.status === "done") {
+					toast({ title: t`Packages updated`, description: `${packages.length} ${t`packages installed successfully`}` })
+				} else {
+					toast({ title: t`Package update failed`, description: status.message ?? t`Check the agent logs for details` })
+				}
+				setSelected(new Set())
+				fetchUpdates(false).catch(() => {})
+				return
+			}
 			announcedJob.current = 0
 			setApplying(status.status ? status : { status: "running", packages })
 		} catch (error: any) {
@@ -157,7 +170,7 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 				description: error?.message ?? t`Failed to start update`,
 			})
 		}
-	}, [systemId, selected])
+	}, [systemId, selected, fetchUpdates])
 
 	const filteredUpdates = useMemo(() => {
 		if (!updates) {

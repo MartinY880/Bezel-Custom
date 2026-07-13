@@ -8,6 +8,7 @@ import (
 	"hash/fnv"
 	"math/rand"
 	"net"
+	"sort"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -510,14 +511,48 @@ func (sys *System) FetchPackageUpdatesFromAgent(refresh bool) ([]system.PackageU
 }
 
 // ApplyPackageUpdatesOnAgent asks the agent to start installing the given
-// packages in the background. The agent acks immediately with the job status;
-// poll FetchPackageUpdateStatusFromAgent for the outcome.
+// packages in the background. New agents ack immediately with a running job
+// status (poll FetchPackageUpdateStatusFromAgent for the outcome). Legacy
+// (pre-async) fork agents install synchronously and reply with a
+// map[package]errMsg — the long timeout accommodates them, and their result
+// is converted to a final PackageApplyStatus.
 func (sys *System) ApplyPackageUpdatesOnAgent(packages []string) (common.PackageApplyStatus, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Minute)
 	defer cancel()
-	var result common.PackageApplyStatus
-	err := sys.request(ctx, common.ApplyPackageUpdates, common.ApplyPackageUpdatesRequest{Packages: packages}, &result)
-	return result, err
+	var raw cbor.RawMessage
+	if err := sys.request(ctx, common.ApplyPackageUpdates, common.ApplyPackageUpdatesRequest{Packages: packages}, &raw); err != nil {
+		return common.PackageApplyStatus{}, err
+	}
+
+	// new agents: PackageApplyStatus ack (Status always set)
+	var status common.PackageApplyStatus
+	if err := cbor.Unmarshal(raw, &status); err == nil && status.Status != "" {
+		return status, nil
+	}
+
+	// legacy agents: map of package -> error message ("" = success), already applied
+	var legacy map[string]string
+	if err := cbor.Unmarshal(raw, &legacy); err == nil && len(legacy) > 0 {
+		status = common.PackageApplyStatus{
+			Status:     common.PkgApplyDone,
+			Packages:   packages,
+			FinishedAt: time.Now().Unix(),
+		}
+		var failed []string
+		for pkg, msg := range legacy {
+			if msg != "" {
+				failed = append(failed, pkg+": "+msg)
+			}
+		}
+		if len(failed) > 0 {
+			sort.Strings(failed)
+			status.Status = common.PkgApplyFailed
+			status.Message = strings.Join(failed, "\n")
+		}
+		return status, nil
+	}
+
+	return common.PackageApplyStatus{}, errors.New("unrecognized apply response from agent")
 }
 
 // FetchPackageUpdateStatusFromAgent returns the agent's current/last
