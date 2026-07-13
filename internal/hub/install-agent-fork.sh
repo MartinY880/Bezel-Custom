@@ -12,6 +12,7 @@
 #
 # Usage:
 #   install-agent.sh -p <port> -k "<pubkey>" -t "<token>" -url "<hub_url>"
+#   install-agent.sh -u    # uninstall
 #
 set -eu
 
@@ -19,6 +20,7 @@ PORT=45876
 KEY=""
 TOKEN=""
 HUB_URL=""
+UNINSTALL=false
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -26,10 +28,37 @@ while [ $# -gt 0 ]; do
     -p) shift; PORT="${1:-}" ;;
     -t) shift; TOKEN="${1:-}" ;;
     -url) shift; HUB_URL="${1:-}" ;;
+    -u) UNINSTALL=true ;;
     *) echo "Unknown argument: $1" >&2; exit 1 ;;
   esac
   shift || true
 done
+
+if [ "$UNINSTALL" = true ]; then
+  if [ "$(id -u)" -ne 0 ]; then
+    if command -v sudo >/dev/null 2>&1; then exec sudo sh "$0" -u
+    elif command -v doas >/dev/null 2>&1; then exec doas sh "$0" -u
+    fi
+    echo "Error: uninstall must run as root." >&2; exit 1
+  fi
+  echo "Uninstalling beszel fork agent..."
+  if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
+    systemctl stop beszel-agent 2>/dev/null || true
+    systemctl disable beszel-agent 2>/dev/null || true
+    rm -f /etc/systemd/system/beszel-agent.service
+    rm -rf /etc/systemd/system/beszel-agent.service.d
+    systemctl daemon-reload
+  fi
+  if command -v rc-service >/dev/null 2>&1; then
+    rc-service beszel-agent stop 2>/dev/null || true
+    rc-update del beszel-agent default 2>/dev/null || true
+    rm -f /etc/init.d/beszel-agent
+    rm -f /var/log/beszel-agent.log /var/log/beszel-agent.err
+  fi
+  rm -rf /opt/beszel-agent
+  echo "Beszel fork agent uninstalled."
+  exit 0
+fi
 
 if [ -z "$HUB_URL" ]; then
   echo "Error: -url <hub_url> is required" >&2
