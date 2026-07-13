@@ -2,6 +2,7 @@ import { t } from "@lingui/core/macro"
 import { Trans } from "@lingui/react/macro"
 import { DownloadIcon, LoaderCircleIcon, RefreshCwIcon } from "lucide-react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -183,23 +184,26 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 		return updates.filter((u) => terms.every((term) => u.n.toLowerCase().includes(term)))
 	}, [updates, filter])
 
-	const allFilteredSelected = filteredUpdates.length > 0 && filteredUpdates.every((u) => selected.has(u.n))
+	// held packages (apt-mark hold) can't be applied; they're never selectable
+	const selectableUpdates = useMemo(() => filteredUpdates.filter((u) => !u.hd), [filteredUpdates])
+
+	const allFilteredSelected = selectableUpdates.length > 0 && selectableUpdates.every((u) => selected.has(u.n))
 
 	const toggleAll = useCallback(() => {
 		setSelected((current) => {
 			const next = new Set(current)
-			if (filteredUpdates.every((u) => next.has(u.n))) {
-				for (const u of filteredUpdates) {
+			if (selectableUpdates.every((u) => next.has(u.n))) {
+				for (const u of selectableUpdates) {
 					next.delete(u.n)
 				}
 			} else {
-				for (const u of filteredUpdates) {
+				for (const u of selectableUpdates) {
 					next.add(u.n)
 				}
 			}
 			return next
 		})
-	}, [filteredUpdates])
+	}, [selectableUpdates])
 
 	const toggleOne = useCallback((name: string) => {
 		setSelected((current) => {
@@ -313,19 +317,31 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 								filteredUpdates.map((update) => (
 									<TableRow
 										key={update.n}
-										className="cursor-pointer"
+										className={update.hd ? "opacity-60" : "cursor-pointer"}
 										data-state={selected.has(update.n) ? "selected" : undefined}
-										onClick={() => toggleOne(update.n)}
+										onClick={() => !update.hd && toggleOne(update.n)}
 									>
 										<TableCell className="px-3 py-2.5">
 											<Checkbox
 												checked={selected.has(update.n)}
+												disabled={update.hd}
 												onCheckedChange={() => toggleOne(update.n)}
 												aria-label={update.n}
 												onClick={(e) => e.stopPropagation()}
 											/>
 										</TableCell>
-										<TableCell className="py-2.5 font-medium">{update.n}</TableCell>
+										<TableCell className="py-2.5 font-medium">
+											{update.n}
+											{update.hd && (
+												<Badge
+													variant="outline"
+													className="ms-2 align-middle"
+													title={t`Pinned with apt-mark hold — lift the hold on the system to update`}
+												>
+													<Trans>Held</Trans>
+												</Badge>
+											)}
+										</TableCell>
 										<TableCell className="py-2.5 text-muted-foreground">{update.cv || "—"}</TableCell>
 										<TableCell className="py-2.5">{update.av || "—"}</TableCell>
 									</TableRow>

@@ -94,6 +94,8 @@ export interface PackageUpdate {
 	cv?: string
 	/** available version */
 	av?: string
+	/** held by admin (apt-mark hold) — cannot be applied */
+	hd?: boolean
 }
 
 export interface SystemStats {

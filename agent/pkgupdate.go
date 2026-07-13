@@ -215,6 +215,7 @@ func checkApt(ctx context.Context) ([]system.PackageUpdate, error) {
 	if err != nil {
 		return nil, err
 	}
+	held := aptHeldPackages(ctx)
 	var updates []system.PackageUpdate
 	scanner := bufio.NewScanner(bytes.NewReader(out))
 	for scanner.Scan() {
@@ -231,13 +232,27 @@ func checkApt(ctx context.Context) ([]system.PackageUpdate, error) {
 		if !found {
 			continue
 		}
-		update := system.PackageUpdate{Name: name, AvailableVersion: fields[1]}
+		update := system.PackageUpdate{Name: name, AvailableVersion: fields[1], Held: held[name]}
 		if last := fields[len(fields)-1]; len(fields) >= 6 && strings.HasSuffix(last, "]") {
 			update.CurrentVersion = strings.TrimSuffix(last, "]")
 		}
 		updates = append(updates, update)
 	}
 	return updates, nil
+}
+
+// aptHeldPackages returns the set of packages pinned via apt-mark hold.
+// Held packages can't be upgraded by apply, so the UI marks them unselectable.
+func aptHeldPackages(ctx context.Context) map[string]bool {
+	held := map[string]bool{}
+	out, err := exec.CommandContext(ctx, "apt-mark", "showhold").Output()
+	if err != nil {
+		return held
+	}
+	for _, name := range strings.Fields(string(out)) {
+		held[name] = true
+	}
+	return held
 }
 
 func checkDnf(ctx context.Context) ([]system.PackageUpdate, error) {
@@ -395,6 +410,16 @@ func (pm *pkgUpdateManager) startApply(packages []string) (common.PackageApplySt
 	defer pm.Unlock()
 	if pm.jobStatus.Status == common.PkgApplyRunning {
 		return pm.jobStatus, errors.New("a package apply is already running")
+	}
+	// fail fast with a clear message instead of letting apt error on holds
+	requested := make(map[string]bool, len(packages))
+	for _, pkg := range packages {
+		requested[pkg] = true
+	}
+	for _, u := range pm.updates {
+		if u.Held && requested[u.Name] {
+			return common.PackageApplyStatus{}, fmt.Errorf("%s is held (apt-mark hold); lift the hold to update it", u.Name)
+		}
 	}
 
 	argv, err := pm.applyArgv()

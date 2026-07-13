@@ -11,7 +11,7 @@ const (
 	// (Pre-release suffixes parse fine everywhere: blang/semver on the backend,
 	// and the frontend's parseSemVer strips them before comparing, so the
 	// 0.14/0.15/0.16 feature gates and Min* version checks are unaffected.)
-	Version = "0.18.3-fork.2"
+	Version = "0.18.3-fork.3"
 	// AppName is the name of the application.
 	AppName = "beszel"
 )

@@ -238,7 +238,13 @@ func (client *WebSocketClient) handleHubRequest(msg *common.HubRequest[cbor.RawM
 		HubVerified:  client.hubVerified,
 		SendResponse: client.sendResponse,
 	}
-	return client.agent.handlerRegistry.Handle(ctx)
+	err := client.agent.handlerRegistry.Handle(ctx)
+	if err != nil && requestID != nil {
+		// Send the error back to the hub so its pending request fails fast with
+		// the real reason instead of waiting out its timeout.
+		_ = client.sendMessage(common.AgentResponse{Id: requestID, Error: err.Error()})
+	}
+	return err
 }
 
 // sendMessage encodes the given data to CBOR and sends it as a binary message over the WebSocket connection to the hub.
