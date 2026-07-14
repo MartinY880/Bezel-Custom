@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro"
 import { Trans } from "@lingui/react/macro"
-import { DownloadIcon, LoaderCircleIcon, RefreshCwIcon } from "lucide-react"
+import { DownloadIcon, LoaderCircleIcon, RefreshCwIcon, ShieldAlertIcon } from "lucide-react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -186,6 +186,11 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 
 	// held packages (apt-mark hold) can't be applied; they're never selectable
 	const selectableUpdates = useMemo(() => filteredUpdates.filter((u) => !u.hd), [filteredUpdates])
+	const securityCount = useMemo(() => (updates ?? []).filter((u) => u.sec && !u.hd).length, [updates])
+
+	const selectSecurity = useCallback(() => {
+		setSelected(new Set((updates ?? []).filter((u) => u.sec && !u.hd).map((u) => u.n)))
+	}, [updates])
 
 	const allFilteredSelected = selectableUpdates.length > 0 && selectableUpdates.every((u) => selected.has(u.n))
 
@@ -244,10 +249,17 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 										</Trans>
 									)}
 								</span>
-							) : updates.length ? (
-								<Trans>
-									Available: {updates.length}. Nothing is installed without your explicit approval.
-								</Trans>
+						) : updates.length ? (
+								<>
+									<Trans>
+										Available: {updates.length}. Nothing is installed without your explicit approval.
+									</Trans>
+									{securityCount > 0 && (
+										<span className="text-red-500 ms-1.5">
+											<Trans>Security: {securityCount}.</Trans>
+										</span>
+									)}
+								</>
 							) : (
 								<Trans>All packages are up to date.</Trans>
 							)}
@@ -261,6 +273,12 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 								onChange={(e) => setFilter(e.target.value)}
 								className="px-4 w-full max-w-full md:w-52"
 							/>
+						)}
+						{securityCount > 0 && (
+							<Button variant="outline" size="sm" onClick={selectSecurity} disabled={isApplying || checking}>
+								<ShieldAlertIcon className="size-4 me-1.5 text-red-500" />
+								<Trans>Select security</Trans> ({securityCount})
+							</Button>
 						)}
 						<Button variant="outline" size="sm" onClick={checkNow} disabled={checking || isApplying}>
 							{checking ? (
@@ -332,6 +350,15 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 										</TableCell>
 										<TableCell className="py-2.5 font-medium">
 											{update.n}
+											{update.sec && (
+												<Badge
+													variant="outline"
+													className="ms-2 align-middle border-red-500/50 text-red-500"
+													title={t`Security update`}
+												>
+													<Trans>security</Trans>
+												</Badge>
+											)}
 											{update.hd && (
 												<Badge
 													variant="outline"

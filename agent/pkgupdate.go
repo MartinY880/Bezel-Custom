@@ -176,6 +176,29 @@ func (pm *pkgUpdateManager) getUpdateCount() uint16 {
 	return uint16(count)
 }
 
+// getSecurityUpdateCount returns how many cached updates are security updates.
+func (pm *pkgUpdateManager) getSecurityUpdateCount() uint16 {
+	pm.Lock()
+	defer pm.Unlock()
+	var count uint16
+	for _, u := range pm.updates {
+		if u.Security && count < 65535 {
+			count++
+		}
+	}
+	return count
+}
+
+// rebootRequired reports whether the host needs a reboot to finish updates
+// (Debian/Ubuntu flag file written by e.g. kernel and libc postinst scripts).
+func rebootRequired() bool {
+	if runtime.GOOS != "linux" {
+		return false
+	}
+	_, err := os.Stat("/var/run/reboot-required")
+	return err == nil
+}
+
 // refresh re-checks the package manager for available updates and replaces the cache.
 func (pm *pkgUpdateManager) refresh() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
@@ -219,7 +242,7 @@ func checkApt(ctx context.Context) ([]system.PackageUpdate, error) {
 	var updates []system.PackageUpdate
 	scanner := bufio.NewScanner(bytes.NewReader(out))
 	for scanner.Scan() {
-		// base-files/stable-updates 12.4+deb12u12 amd64 [upgradable from: 12.4+deb12u11]
+		// base-files/stable-updates,stable-security 12.4+deb12u12 amd64 [upgradable from: 12.4+deb12u11]
 		line := strings.TrimSpace(scanner.Text())
 		if line == "" || strings.HasPrefix(line, "Listing") {
 			continue
@@ -228,11 +251,17 @@ func checkApt(ctx context.Context) ([]system.PackageUpdate, error) {
 		if len(fields) < 2 {
 			continue
 		}
-		name, _, found := strings.Cut(fields[0], "/")
+		name, suites, found := strings.Cut(fields[0], "/")
 		if !found {
 			continue
 		}
-		update := system.PackageUpdate{Name: name, AvailableVersion: fields[1], Held: held[name]}
+		update := system.PackageUpdate{
+			Name:             name,
+			AvailableVersion: fields[1],
+			Held:             held[name],
+			// suites like "jammy-security" / "bookworm-security" mark security updates
+			Security: strings.Contains(suites, "security"),
+		}
 		if last := fields[len(fields)-1]; len(fields) >= 6 && strings.HasSuffix(last, "]") {
 			update.CurrentVersion = strings.TrimSuffix(last, "]")
 		}

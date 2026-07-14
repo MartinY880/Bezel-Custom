@@ -565,6 +565,15 @@ func (sys *System) UpdateAgentFromHub(hubURL string, checksums map[string]string
 	return result, err
 }
 
+// RebootHostViaAgent asks the agent to reboot its host (2s delayed so the
+// response arrives first).
+func (sys *System) RebootHostViaAgent() error {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	var result string
+	return sys.request(ctx, common.RebootSystem, nil, &result)
+}
+
 // FetchPackageUpdateStatusFromAgent returns the agent's current/last
 // background apply job state.
 func (sys *System) FetchPackageUpdateStatusFromAgent() (common.PackageApplyStatus, error) {

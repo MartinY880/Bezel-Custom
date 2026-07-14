@@ -35,6 +35,10 @@ msgstr "{count, plural, one {{countString} hour} other {{countString} hours}}"
 msgid "{count, plural, one {{countString} minute} few {{countString} minutes} many {{countString} minutes} other {{countString} minutes}}"
 msgstr "{count, plural, one {{countString} minute} few {{countString} minutes} many {{countString} minutes} other {{countString} minutes}}"
 
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "{name} is restarting now"
+msgstr "{name} is restarting now"
+
 #: src/components/routes/system/info-bar.tsx
 msgid "{threads, plural, one {# thread} other {# threads}}"
 msgstr "{threads, plural, one {# thread} other {# threads}}"
@@ -162,8 +166,13 @@ msgid "Agent up to date"
 msgstr "Agent up to date"
 
 #: src/components/systems-table/systems-table-columns.tsx
+#: src/components/update-agents-button.tsx
 msgid "Agent update failed"
 msgstr "Agent update failed"
+
+#: src/components/update-agents-button.tsx
+msgid "Agent updates pushed"
+msgstr "Agent updates pushed"
 
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Agent updating"
@@ -199,6 +208,10 @@ msgstr "All packages are up to date."
 #: src/components/systems-table/systems-table.tsx
 msgid "All Systems"
 msgstr "All Systems"
+
+#: src/components/update-agents-button.tsx
+msgid "Already current"
+msgstr "Already current"
 
 #: src/components/package-updates-table/package-updates-table.tsx
 msgid "Apply selected"
@@ -361,6 +374,8 @@ msgstr "Can stop"
 #: src/components/routes/settings/general.tsx
 #: src/components/routes/settings/quiet-hours.tsx
 #: src/components/systems-table/systems-table-columns.tsx
+#: src/components/systems-table/systems-table-columns.tsx
+#: src/components/update-agents-button.tsx
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -765,6 +780,10 @@ msgstr "Ephemeral"
 msgid "Error"
 msgstr "Error"
 
+#: src/components/update-agents-button.tsx
+msgid "Every online system downloads the hub's current agent build, verifies it, and restarts its agent. Agents that are already current are skipped. Each system may show as down for a few seconds while its agent restarts."
+msgstr "Every online system downloads the hub's current agent build, verifies it, and restarts its agent. Agents that are already current are skipped. Each system may show as down for a few seconds while its agent restarts."
+
 #. placeholder {0}: alert.value
 #. placeholder {1}: info.unit
 #. placeholder {2}: alert.min
@@ -809,6 +828,7 @@ msgid "Fahrenheit (°F)"
 msgstr "Fahrenheit (°F)"
 
 #: src/components/systems-table/systems-table-columns.tsx
+#: src/components/update-agents-button.tsx
 msgid "Failed"
 msgstr "Failed"
 
@@ -957,6 +977,10 @@ msgstr "Inactive"
 #: src/components/login/auth-form.tsx
 msgid "Invalid email address."
 msgstr "Invalid email address."
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "It will show as down for a short time while it comes back up."
+msgstr "It will show as down for a short time while it comes back up."
 
 #: src/components/routes/settings/general.tsx
 msgid "Label"
@@ -1363,6 +1387,10 @@ msgstr "Process started"
 msgid "Public Key"
 msgstr "Public Key"
 
+#: src/components/update-agents-button.tsx
+msgid "Push the hub's agent build to all systems"
+msgstr "Push the hub's agent build to all systems"
+
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Pushing agent update to {name}..."
 msgstr "Pushing agent update to {name}..."
@@ -1380,6 +1408,30 @@ msgstr "Quiet Hours"
 #: src/components/routes/system.tsx
 msgid "Read"
 msgstr "Read"
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Reboot"
+msgstr "Reboot"
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Reboot {name}?"
+msgstr "Reboot {name}?"
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Reboot failed"
+msgstr "Reboot failed"
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Reboot required"
+msgstr "Reboot required"
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Reboot system"
+msgstr "Reboot system"
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Rebooting"
+msgstr "Rebooting"
 
 #: src/components/routes/system.tsx
 msgid "Received"
@@ -1496,6 +1548,19 @@ msgstr "Search"
 msgid "Search for systems or settings..."
 msgstr "Search for systems or settings..."
 
+#: src/components/package-updates-table/package-updates-table.tsx
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "security"
+msgstr "security"
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Security update"
+msgstr "Security update"
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Security: {securityCount}."
+msgstr "Security: {securityCount}."
+
 #: src/components/alerts/alerts-sheet.tsx
 msgid "See <0>notification settings</0> to configure how you receive alerts."
 msgstr "See <0>notification settings</0> to configure how you receive alerts."
@@ -1507,6 +1572,10 @@ msgstr "Select {foo}"
 #: src/components/package-updates-table/package-updates-table.tsx
 msgid "Select all"
 msgstr "Select all"
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Select security"
+msgstr "Select security"
 
 #: src/components/routes/system.tsx
 msgid "Sent"
@@ -1653,6 +1722,10 @@ msgstr "Test <0>URL</0>"
 msgid "Test notification sent"
 msgstr "Test notification sent"
 
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "The host will restart immediately."
+msgstr "The host will restart immediately."
+
 #: src/components/login/forgot-pass-form.tsx
 msgid "Then log into the backend and reset your user account password in the users table."
 msgstr "Then log into the backend and reset your user account password in the users table."
@@ -1660,6 +1733,10 @@ msgstr "Then log into the backend and reset your user account password in the us
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "This action cannot be undone. This will permanently delete all current records for {name} from the database."
 msgstr "This action cannot be undone. This will permanently delete all current records for {name} from the database."
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "This system needs a reboot to finish applying updates."
+msgstr "This system needs a reboot to finish applying updates."
 
 #: src/components/routes/settings/alerts-history-data-table.tsx
 msgid "This will permanently delete all selected records from the database."
@@ -1828,9 +1905,22 @@ msgstr "Update"
 msgid "Update agent"
 msgstr "Update agent"
 
+#: src/components/update-agents-button.tsx
+msgid "Update agents"
+msgstr "Update agents"
+
+#: src/components/update-agents-button.tsx
+msgid "Update all"
+msgstr "Update all"
+
+#: src/components/update-agents-button.tsx
+msgid "Update all agents?"
+msgstr "Update all agents?"
+
 #: src/components/containers-table/containers-table-columns.tsx
 #: src/components/routes/system/smart-table.tsx
 #: src/components/systemd-table/systemd-table-columns.tsx
+#: src/components/update-agents-button.tsx
 msgid "Updated"
 msgstr "Updated"
 

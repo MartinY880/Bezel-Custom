@@ -5,13 +5,14 @@ package beszel
 import "github.com/blang/semver"
 
 const (
-	// Version is the current version of the application.
-	// The -fork.N suffix identifies fork builds: bump N on every release that
-	// changes the agent, so pushed agents are distinguishable in the UI.
-	// (Pre-release suffixes parse fine everywhere: blang/semver on the backend,
-	// and the frontend's parseSemVer strips them before comparing, so the
-	// 0.14/0.15/0.16 feature gates and Min* version checks are unaffected.)
-	Version = "0.18.3-fork.3"
+	// Version is the current version of the application (fork numbering).
+	// Bump the patch on every release that changes the agent, so pushed agents
+	// are distinguishable in the UI. IMPORTANT: must always sort ABOVE 0.18.3
+	// in semver order — the hub's Min* checks (0.12/0.13) and the frontend
+	// feature gates (0.14/0.15/0.16) compare this value, so a lower version
+	// (e.g. 0.5.x) would silently disable features and legacy-downgrade the
+	// protocol.
+	Version = "5.24.0"
 	// AppName is the name of the application.
 	AppName = "beszel"
 )

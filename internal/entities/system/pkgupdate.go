@@ -8,4 +8,7 @@ type PackageUpdate struct {
 	// Held marks packages pinned by the admin (apt-mark hold); they can't be
 	// applied without lifting the hold, so the UI shows them unselectable.
 	Held bool `json:"hd,omitempty" cbor:"3,keyasint,omitempty"`
+	// Security marks updates from the distro's security pocket (apt suites
+	// containing "security"), so the UI can highlight and bulk-select them.
+	Security bool `json:"sec,omitempty" cbor:"4,keyasint,omitempty"`
 }

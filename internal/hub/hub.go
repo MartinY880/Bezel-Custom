@@ -331,6 +331,10 @@ func (h *Hub) registerApiRoutes(se *core.ServeEvent) error {
 	apiExt.GET("/systems/{id}/updates/status", h.packageUpdateStatus)
 	// push a fork agent binary update to a system's agent
 	apiExt.POST("/systems/{id}/agent/update", h.updateAgent)
+	// push agent binary updates to every up system at once
+	apiExt.POST("/agents/update-all", h.updateAllAgents)
+	// reboot a system's host (user-confirmed; used for reboot-required)
+	apiExt.POST("/systems/{id}/reboot", h.rebootSystem)
 
 	// fork: hub-served agent installer + binaries. Unauthenticated because the
 	// target host has no hub credentials yet; neither the script nor the binary

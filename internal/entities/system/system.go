@@ -152,6 +152,8 @@ type Info struct {
 	Services       []uint16           `json:"sv,omitempty" cbor:"22,keyasint,omitempty"` // [totalServices, numFailedServices]
 	Battery        [2]uint8           `json:"bat,omitzero" cbor:"23,keyasint,omitzero"`  // [percent, charge state]
 	PkgUpdates     uint16             `json:"pu,omitempty" cbor:"24,keyasint,omitempty"` // count of available package updates
+	RebootRequired bool               `json:"rb,omitempty" cbor:"25,keyasint,omitempty"` // host needs a reboot to finish updates
+	PkgUpdatesSec  uint16             `json:"pus,omitempty" cbor:"26,keyasint,omitempty"` // count of available security updates
 }
 
 // Data that does not change during process lifetime and is not needed in All Systems table

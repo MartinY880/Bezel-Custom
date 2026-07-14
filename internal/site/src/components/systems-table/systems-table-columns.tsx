@@ -19,6 +19,7 @@ import {
 	PauseCircleIcon,
 	PenBoxIcon,
 	PlayCircleIcon,
+	RotateCcwIcon,
 	ServerIcon,
 	TerminalSquareIcon,
 	Trash2Icon,
@@ -389,13 +390,31 @@ export function SystemsTableColumns(viewMode: "table" | "grid"): ColumnDef<Syste
 			cell(info) {
 				const sys = info.row.original
 				const count = sys.info.pu ?? 0
-				if (sys.status !== SystemStatus.Up || count === 0) {
+				const secCount = sys.info.pus ?? 0
+				const rebootNeeded = sys.info.rb ?? false
+				if (sys.status !== SystemStatus.Up || (count === 0 && !rebootNeeded)) {
 					return null
 				}
 				return (
-					<span className="tabular-nums whitespace-nowrap flex gap-1.5 items-center">
-						<span className={cn("block size-2 rounded-full", STATUS_COLORS[SystemStatus.Pending])} />
-						{count}
+					<span
+						className="tabular-nums whitespace-nowrap flex gap-1.5 items-center"
+						title={
+							(secCount > 0 ? `${secCount} ${t`security`}` : "") +
+							(rebootNeeded ? `${secCount > 0 ? " · " : ""}${t`Reboot required`}` : "")
+						}
+					>
+						{count > 0 && (
+							<>
+								<span
+									className={cn(
+										"block size-2 rounded-full",
+										secCount > 0 ? STATUS_COLORS[SystemStatus.Down] : STATUS_COLORS[SystemStatus.Pending]
+									)}
+								/>
+								{count}
+							</>
+						)}
+						{rebootNeeded && <RotateCcwIcon className="size-3.5 text-red-500" />}
 					</span>
 				)
 			},
@@ -625,6 +644,7 @@ export function IndicatorDot({ system, className }: { system: SystemRecord; clas
 
 export const ActionsButton = memo(({ system }: { system: SystemRecord }) => {
 	const [deleteOpen, setDeleteOpen] = useState(false)
+	const [rebootOpen, setRebootOpen] = useState(false)
 	const [editOpen, setEditOpen] = useState(false)
 	const editOpened = useRef(false)
 	const { t } = useLingui()
@@ -703,6 +723,14 @@ export const ActionsButton = memo(({ system }: { system: SystemRecord }) => {
 							<DownloadIcon className="me-2.5 size-4" />
 							<Trans>Update agent</Trans>
 						</DropdownMenuItem>
+						<DropdownMenuItem
+							className={cn((isReadOnlyUser() || status !== SystemStatus.Up) && "hidden")}
+							onSelect={() => setRebootOpen(true)}
+						>
+							<RotateCcwIcon className="me-2.5 size-4" />
+							<Trans>Reboot system</Trans>
+							{system.info?.rb && <span className="ms-1.5 size-1.5 rounded-full bg-red-500" />}
+						</DropdownMenuItem>
 						<DropdownMenuSeparator className={cn(isReadOnlyUser() && "hidden")} />
 						<DropdownMenuItem className={cn(isReadOnlyUser() && "hidden")} onSelect={() => setDeleteOpen(true)}>
 							<Trash2Icon className="me-2.5 size-4" />
@@ -714,6 +742,42 @@ export const ActionsButton = memo(({ system }: { system: SystemRecord }) => {
 				<Dialog open={editOpen} onOpenChange={setEditOpen}>
 					{editOpened.current && <SystemDialog system={system} setOpen={setEditOpen} />}
 				</Dialog>
+				{/* reboot dialog */}
+				<AlertDialog open={rebootOpen} onOpenChange={setRebootOpen}>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>
+								<Trans>Reboot {name}?</Trans>
+							</AlertDialogTitle>
+							<AlertDialogDescription>
+								{system.info?.rb ? (
+									<Trans>This system needs a reboot to finish applying updates.</Trans>
+								) : (
+									<Trans>The host will restart immediately.</Trans>
+								)}{" "}
+								<Trans>It will show as down for a short time while it comes back up.</Trans>
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel>
+								<Trans>Cancel</Trans>
+							</AlertDialogCancel>
+							<AlertDialogAction
+								className={cn(buttonVariants({ variant: "destructive" }))}
+								onClick={async () => {
+									try {
+										await pb.send(`/api/beszel-ext/systems/${id}/reboot`, { method: "POST", requestKey: null })
+										toast({ title: t`Rebooting`, description: t`${name} is restarting now` })
+									} catch (error: any) {
+										toast({ title: t`Reboot failed`, description: error?.message })
+									}
+								}}
+							>
+								<Trans>Reboot</Trans>
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
 				{/* deletion dialog */}
 				<AlertDialog open={deleteOpen} onOpenChange={(open) => setDeleteOpen(open)}>
 					<AlertDialogContent>
@@ -743,5 +807,5 @@ export const ActionsButton = memo(({ system }: { system: SystemRecord }) => {
 				</AlertDialog>
 			</>
 		)
-	}, [id, status, host, name, system, t, deleteOpen, editOpen])
+	}, [id, status, host, name, system, t, deleteOpen, editOpen, rebootOpen])
 })

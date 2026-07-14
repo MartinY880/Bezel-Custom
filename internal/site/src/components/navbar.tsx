@@ -27,6 +27,7 @@ import { isAdmin, isReadOnlyUser, logOut, pb } from "@/lib/api"
 import { cn, runOnce } from "@/lib/utils"
 import { AddSystemButton } from "./add-system"
 import { ExternalLinksBar } from "./external-links"
+import { UpdateAgentsButton } from "./update-agents-button"
 import { LangToggle } from "./lang-toggle"
 import { Logo } from "./logo"
 import { ModeToggle } from "./mode-toggle"
@@ -152,6 +153,7 @@ export default function Navbar() {
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
+				<UpdateAgentsButton className="ms-2" />
 				<AddSystemButton className="ms-2" />
 			</div>
 		</div>

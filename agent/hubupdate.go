@@ -8,6 +8,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"os/exec"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -99,6 +100,32 @@ func selfUpdateFromHub(req common.AgentUpdateRequest) (common.AgentUpdateRespons
 	}()
 
 	return common.AgentUpdateResponse{Updated: true, Message: "updated, restarting"}, nil
+}
+
+// rebootHost schedules a host reboot in 2 seconds (so the response reaches
+// the hub first). Requires root.
+func rebootHost() error {
+	if runtime.GOOS != "linux" {
+		return errors.ErrUnsupported
+	}
+	if os.Geteuid() != 0 {
+		return errors.New("reboot requires the agent to run as root")
+	}
+	rebootCmd := []string{"reboot"}
+	if _, err := os.Stat("/run/systemd/system"); err == nil {
+		rebootCmd = []string{"systemctl", "reboot"}
+	}
+	if _, err := exec.LookPath(rebootCmd[0]); err != nil {
+		return fmt.Errorf("no reboot command available: %w", err)
+	}
+	slog.Info("Reboot requested by hub, rebooting in 2s")
+	go func() {
+		time.Sleep(2 * time.Second)
+		if err := exec.Command(rebootCmd[0], rebootCmd[1:]...).Run(); err != nil {
+			slog.Error("Reboot command failed", "err", err)
+		}
+	}()
+	return nil
 }
 
 func fileSha256(path string) (string, error) {

@@ -40,6 +40,10 @@ msgstr "{count, plural, one {{countString} 小时} other {{countString} 小时}}
 msgid "{count, plural, one {{countString} minute} few {{countString} minutes} many {{countString} minutes} other {{countString} minutes}}"
 msgstr "{count, plural, one {{countString} 分钟} few {{countString} 分钟} many {{countString} 分钟} other {{countString} 分钟}}"
 
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "{name} is restarting now"
+msgstr ""
+
 #: src/components/routes/system/info-bar.tsx
 msgid "{threads, plural, one {# thread} other {# threads}}"
 msgstr "{threads, plural, one {# 线程} other {# 线程}}"
@@ -167,7 +171,12 @@ msgid "Agent up to date"
 msgstr ""
 
 #: src/components/systems-table/systems-table-columns.tsx
+#: src/components/update-agents-button.tsx
 msgid "Agent update failed"
+msgstr ""
+
+#: src/components/update-agents-button.tsx
+msgid "Agent updates pushed"
 msgstr ""
 
 #: src/components/systems-table/systems-table-columns.tsx
@@ -204,6 +213,10 @@ msgstr ""
 #: src/components/systems-table/systems-table.tsx
 msgid "All Systems"
 msgstr "所有客户端"
+
+#: src/components/update-agents-button.tsx
+msgid "Already current"
+msgstr ""
 
 #: src/components/package-updates-table/package-updates-table.tsx
 msgid "Apply selected"
@@ -366,6 +379,8 @@ msgstr "可停止"
 #: src/components/routes/settings/general.tsx
 #: src/components/routes/settings/quiet-hours.tsx
 #: src/components/systems-table/systems-table-columns.tsx
+#: src/components/systems-table/systems-table-columns.tsx
+#: src/components/update-agents-button.tsx
 msgid "Cancel"
 msgstr "取消"
 
@@ -770,6 +785,10 @@ msgstr "临时"
 msgid "Error"
 msgstr "错误"
 
+#: src/components/update-agents-button.tsx
+msgid "Every online system downloads the hub's current agent build, verifies it, and restarts its agent. Agents that are already current are skipped. Each system may show as down for a few seconds while its agent restarts."
+msgstr ""
+
 #. placeholder {0}: alert.value
 #. placeholder {1}: info.unit
 #. placeholder {2}: alert.min
@@ -814,6 +833,7 @@ msgid "Fahrenheit (°F)"
 msgstr "华氏度 (°F)"
 
 #: src/components/systems-table/systems-table-columns.tsx
+#: src/components/update-agents-button.tsx
 msgid "Failed"
 msgstr "失败"
 
@@ -962,6 +982,10 @@ msgstr "非活跃"
 #: src/components/login/auth-form.tsx
 msgid "Invalid email address."
 msgstr "无效的电子邮件地址。"
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "It will show as down for a short time while it comes back up."
+msgstr ""
 
 #: src/components/routes/settings/general.tsx
 msgid "Label"
@@ -1368,6 +1392,10 @@ msgstr "进程启动"
 msgid "Public Key"
 msgstr "公钥"
 
+#: src/components/update-agents-button.tsx
+msgid "Push the hub's agent build to all systems"
+msgstr ""
+
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Pushing agent update to {name}..."
 msgstr ""
@@ -1385,6 +1413,30 @@ msgstr "静默时间"
 #: src/components/routes/system.tsx
 msgid "Read"
 msgstr "读取"
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Reboot"
+msgstr ""
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Reboot {name}?"
+msgstr ""
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Reboot failed"
+msgstr ""
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Reboot required"
+msgstr ""
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Reboot system"
+msgstr ""
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Rebooting"
+msgstr ""
 
 #: src/components/routes/system.tsx
 msgid "Received"
@@ -1501,6 +1553,19 @@ msgstr "搜索"
 msgid "Search for systems or settings..."
 msgstr "搜索系统或设置..."
 
+#: src/components/package-updates-table/package-updates-table.tsx
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "security"
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Security update"
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Security: {securityCount}."
+msgstr ""
+
 #: src/components/alerts/alerts-sheet.tsx
 msgid "See <0>notification settings</0> to configure how you receive alerts."
 msgstr "查看<0>通知设置</0>以配置您接收警报的方式。"
@@ -1511,6 +1576,10 @@ msgstr "选择 {foo}"
 
 #: src/components/package-updates-table/package-updates-table.tsx
 msgid "Select all"
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Select security"
 msgstr ""
 
 #: src/components/routes/system.tsx
@@ -1658,6 +1727,10 @@ msgstr "测试<0>URL</0>"
 msgid "Test notification sent"
 msgstr "测试通知已发送"
 
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "The host will restart immediately."
+msgstr ""
+
 #: src/components/login/forgot-pass-form.tsx
 msgid "Then log into the backend and reset your user account password in the users table."
 msgstr "然后登录到后台并在用户表中重置您的用户账户密码。"
@@ -1665,6 +1738,10 @@ msgstr "然后登录到后台并在用户表中重置您的用户账户密码。
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "This action cannot be undone. This will permanently delete all current records for {name} from the database."
 msgstr "此操作无法撤销。这将永久删除数据库中{name}的所有当前记录。"
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "This system needs a reboot to finish applying updates."
+msgstr ""
 
 #: src/components/routes/settings/alerts-history-data-table.tsx
 msgid "This will permanently delete all selected records from the database."
@@ -1833,9 +1910,22 @@ msgstr "更新"
 msgid "Update agent"
 msgstr ""
 
+#: src/components/update-agents-button.tsx
+msgid "Update agents"
+msgstr ""
+
+#: src/components/update-agents-button.tsx
+msgid "Update all"
+msgstr ""
+
+#: src/components/update-agents-button.tsx
+msgid "Update all agents?"
+msgstr ""
+
 #: src/components/containers-table/containers-table-columns.tsx
 #: src/components/routes/system/smart-table.tsx
 #: src/components/systemd-table/systemd-table-columns.tsx
+#: src/components/update-agents-button.tsx
 msgid "Updated"
 msgstr "更新于"
 

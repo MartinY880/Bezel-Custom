@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
+	"sync"
 
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
@@ -73,6 +75,72 @@ func (h *Hub) updateAgent(e *core.RequestEvent) error {
 		return apis.NewApiError(http.StatusBadGateway, "agent update failed: "+msg, nil)
 	}
 	return e.JSON(http.StatusOK, result)
+}
+
+// updateAllAgents handles POST /api/beszel-ext/agents/update-all.
+// Pushes the staged fork binary to every "up" system concurrently and returns
+// a per-system result map: "updated", "up to date", or the error message.
+func (h *Hub) updateAllAgents(e *core.RequestEvent) error {
+	checksums := h.stagedAgentChecksums()
+	if len(checksums) == 0 {
+		return apis.NewApiError(http.StatusServiceUnavailable, "no agent binaries staged on the hub (data dir /agents)", nil)
+	}
+	records, err := h.FindRecordsByFilter("systems", "status = 'up'", "", 500, 0)
+	if err != nil {
+		return apis.NewApiError(http.StatusInternalServerError, err.Error(), nil)
+	}
+
+	type outcome struct{ name, result string }
+	results := make(chan outcome, len(records))
+	var wg sync.WaitGroup
+	// bounded concurrency so one slow agent doesn't serialize the rest
+	sem := make(chan struct{}, 5)
+	for _, rec := range records {
+		wg.Add(1)
+		go func(id, name string) {
+			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
+			system, err := h.sm.GetSystem(id)
+			if err != nil {
+				results <- outcome{name, "error: " + err.Error()}
+				return
+			}
+			res, err := system.UpdateAgentFromHub(h.appURL, checksums)
+			switch {
+			case err != nil:
+				msg := err.Error()
+				if strings.Contains(msg, "unknown action") {
+					msg = "agent too old for remote update - reinstall once"
+				}
+				results <- outcome{name, "error: " + msg}
+			case res.Updated:
+				results <- outcome{name, "updated"}
+			default:
+				results <- outcome{name, "up to date"}
+			}
+		}(rec.Id, rec.GetString("name"))
+	}
+	wg.Wait()
+	close(results)
+
+	out := make(map[string]string, len(records))
+	for o := range results {
+		out[o.name] = o.result
+	}
+	return e.JSON(http.StatusOK, map[string]any{"results": out})
+}
+
+// rebootSystem handles POST /api/beszel-ext/systems/{id}/reboot.
+func (h *Hub) rebootSystem(e *core.RequestEvent) error {
+	system, err := h.sm.GetSystem(e.Request.PathValue("id"))
+	if err != nil {
+		return e.NotFoundError("system not found", nil)
+	}
+	if err := system.RebootHostViaAgent(); err != nil {
+		return apis.NewApiError(http.StatusBadGateway, "reboot failed: "+err.Error(), nil)
+	}
+	return e.JSON(http.StatusOK, map[string]string{"status": "rebooting"})
 }
 
 // serveAgentBinary serves the fork agent binary for a given arch from

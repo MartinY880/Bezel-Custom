@@ -30,6 +30,9 @@ const (
 	GetPackageUpdateStatus
 	// Tell the agent to download the fork binary from the hub and self-update
 	UpdateAgent
+	// Tell the agent to reboot the host (used when a reboot is required to
+	// finish applying updates)
+	RebootSystem
 	// Add new actions here...
 )
 

@@ -40,6 +40,10 @@ msgstr "{count, plural, one {{countString} heure} other {{countString} heures}}"
 msgid "{count, plural, one {{countString} minute} few {{countString} minutes} many {{countString} minutes} other {{countString} minutes}}"
 msgstr "{count, plural, one {{countString} minute} other {{countString} minutes}}"
 
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "{name} is restarting now"
+msgstr ""
+
 #: src/components/routes/system/info-bar.tsx
 msgid "{threads, plural, one {# thread} other {# threads}}"
 msgstr "{threads, plural, one {# fil} other {# fils}}"
@@ -167,7 +171,12 @@ msgid "Agent up to date"
 msgstr ""
 
 #: src/components/systems-table/systems-table-columns.tsx
+#: src/components/update-agents-button.tsx
 msgid "Agent update failed"
+msgstr ""
+
+#: src/components/update-agents-button.tsx
+msgid "Agent updates pushed"
 msgstr ""
 
 #: src/components/systems-table/systems-table-columns.tsx
@@ -204,6 +213,10 @@ msgstr ""
 #: src/components/systems-table/systems-table.tsx
 msgid "All Systems"
 msgstr "Tous les systèmes"
+
+#: src/components/update-agents-button.tsx
+msgid "Already current"
+msgstr ""
 
 #: src/components/package-updates-table/package-updates-table.tsx
 msgid "Apply selected"
@@ -366,6 +379,8 @@ msgstr "Peut arrêter"
 #: src/components/routes/settings/general.tsx
 #: src/components/routes/settings/quiet-hours.tsx
 #: src/components/systems-table/systems-table-columns.tsx
+#: src/components/systems-table/systems-table-columns.tsx
+#: src/components/update-agents-button.tsx
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -770,6 +785,10 @@ msgstr "Éphémère"
 msgid "Error"
 msgstr "Erreur"
 
+#: src/components/update-agents-button.tsx
+msgid "Every online system downloads the hub's current agent build, verifies it, and restarts its agent. Agents that are already current are skipped. Each system may show as down for a few seconds while its agent restarts."
+msgstr ""
+
 #. placeholder {0}: alert.value
 #. placeholder {1}: info.unit
 #. placeholder {2}: alert.min
@@ -814,6 +833,7 @@ msgid "Fahrenheit (°F)"
 msgstr "Fahrenheit (°F)"
 
 #: src/components/systems-table/systems-table-columns.tsx
+#: src/components/update-agents-button.tsx
 msgid "Failed"
 msgstr "Échoué"
 
@@ -962,6 +982,10 @@ msgstr "Inactif"
 #: src/components/login/auth-form.tsx
 msgid "Invalid email address."
 msgstr "Adresse email invalide."
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "It will show as down for a short time while it comes back up."
+msgstr ""
 
 #: src/components/routes/settings/general.tsx
 msgid "Label"
@@ -1368,6 +1392,10 @@ msgstr "Processus démarré"
 msgid "Public Key"
 msgstr "Clé publique"
 
+#: src/components/update-agents-button.tsx
+msgid "Push the hub's agent build to all systems"
+msgstr ""
+
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Pushing agent update to {name}..."
 msgstr ""
@@ -1385,6 +1413,30 @@ msgstr "Heures calmes"
 #: src/components/routes/system.tsx
 msgid "Read"
 msgstr "Lecture"
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Reboot"
+msgstr ""
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Reboot {name}?"
+msgstr ""
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Reboot failed"
+msgstr ""
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Reboot required"
+msgstr ""
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Reboot system"
+msgstr ""
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Rebooting"
+msgstr ""
 
 #: src/components/routes/system.tsx
 msgid "Received"
@@ -1501,6 +1553,19 @@ msgstr "Recherche"
 msgid "Search for systems or settings..."
 msgstr "Rechercher des systèmes ou des paramètres..."
 
+#: src/components/package-updates-table/package-updates-table.tsx
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "security"
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Security update"
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Security: {securityCount}."
+msgstr ""
+
 #: src/components/alerts/alerts-sheet.tsx
 msgid "See <0>notification settings</0> to configure how you receive alerts."
 msgstr "Voir les <0>paramètres de notification</0> pour configurer comment vous recevez les alertes."
@@ -1511,6 +1576,10 @@ msgstr "Sélectionner {foo}"
 
 #: src/components/package-updates-table/package-updates-table.tsx
 msgid "Select all"
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Select security"
 msgstr ""
 
 #: src/components/routes/system.tsx
@@ -1658,6 +1727,10 @@ msgstr "Tester <0>URL</0>"
 msgid "Test notification sent"
 msgstr "Notification de test envoyée"
 
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "The host will restart immediately."
+msgstr ""
+
 #: src/components/login/forgot-pass-form.tsx
 msgid "Then log into the backend and reset your user account password in the users table."
 msgstr "Ensuite, connectez-vous au backend et réinitialisez le mot de passe de votre compte utilisateur dans la table des utilisateurs."
@@ -1665,6 +1738,10 @@ msgstr "Ensuite, connectez-vous au backend et réinitialisez le mot de passe de 
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "This action cannot be undone. This will permanently delete all current records for {name} from the database."
 msgstr "Cette action ne peut pas être annulée. Cela supprimera définitivement tous les enregistrements actuels pour {name} de la base de données."
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "This system needs a reboot to finish applying updates."
+msgstr ""
 
 #: src/components/routes/settings/alerts-history-data-table.tsx
 msgid "This will permanently delete all selected records from the database."
@@ -1833,9 +1910,22 @@ msgstr "Mettre à jour"
 msgid "Update agent"
 msgstr ""
 
+#: src/components/update-agents-button.tsx
+msgid "Update agents"
+msgstr ""
+
+#: src/components/update-agents-button.tsx
+msgid "Update all"
+msgstr ""
+
+#: src/components/update-agents-button.tsx
+msgid "Update all agents?"
+msgstr ""
+
 #: src/components/containers-table/containers-table-columns.tsx
 #: src/components/routes/system/smart-table.tsx
 #: src/components/systemd-table/systemd-table-columns.tsx
+#: src/components/update-agents-button.tsx
 msgid "Updated"
 msgstr "Mis à jour"
 

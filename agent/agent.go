@@ -206,6 +206,8 @@ func (a *Agent) gatherStats(options common.DataRequestOptions) *system.CombinedD
 
 	if a.pkgUpdateManager != nil {
 		data.Info.PkgUpdates = a.pkgUpdateManager.getUpdateCount()
+		data.Info.PkgUpdatesSec = a.pkgUpdateManager.getSecurityUpdateCount()
+		data.Info.RebootRequired = rebootRequired()
 	}
 
 	data.Stats.ExtraFs = make(map[string]*system.FsStats)

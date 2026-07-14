@@ -85,6 +85,10 @@ export interface SystemInfo {
 	sv?: [number, number]
 	/** count of available package updates */
 	pu?: number
+	/** count of available security updates */
+	pus?: number
+	/** reboot required to finish updates */
+	rb?: boolean
 }
 
 export interface PackageUpdate {
@@ -96,6 +100,8 @@ export interface PackageUpdate {
 	av?: string
 	/** held by admin (apt-mark hold) — cannot be applied */
 	hd?: boolean
+	/** security update (distro security pocket) */
+	sec?: boolean
 }
 
 export interface SystemStats {

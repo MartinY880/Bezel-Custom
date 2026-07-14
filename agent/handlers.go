@@ -55,6 +55,7 @@ func NewHandlerRegistry() *HandlerRegistry {
 	registry.Register(common.ApplyPackageUpdates, &ApplyPackageUpdatesHandler{})
 	registry.Register(common.GetPackageUpdateStatus, &GetPackageUpdateStatusHandler{})
 	registry.Register(common.UpdateAgent, &UpdateAgentHandler{})
+	registry.Register(common.RebootSystem, &RebootSystemHandler{})
 
 	return registry
 }
@@ -269,6 +270,20 @@ func (h *GetPackageUpdateStatusHandler) Handle(hctx *HandlerContext) error {
 		return errors.ErrUnsupported
 	}
 	return hctx.SendResponse(hctx.Agent.pkgUpdateManager.applyStatus(), hctx.RequestID)
+}
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+// RebootSystemHandler reboots the host. Used from the hub UI when a system
+// reports RebootRequired after updates; the user confirms in a dialog first.
+type RebootSystemHandler struct{}
+
+func (h *RebootSystemHandler) Handle(hctx *HandlerContext) error {
+	if err := rebootHost(); err != nil {
+		return err
+	}
+	return hctx.SendResponse("rebooting", hctx.RequestID)
 }
 
 ////////////////////////////////////////////////////////////////////////////
