@@ -40,6 +40,16 @@ msgstr "{count, plural, one {{countString} saat} other {{countString} saat}}"
 msgid "{count, plural, one {{countString} minute} few {{countString} minutes} many {{countString} minutes} other {{countString} minutes}}"
 msgstr "{count, plural, one {{countString} dakika} few {{countString} dakika} many {{countString} dakika} other {{countString} dakika}}"
 
+#. placeholder {0}: system.info?.pus ?? 0
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "{name} is installing {0} security updates in the background"
+msgstr ""
+
+#. placeholder {0}: system.info?.pu ?? 0
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "{name} is installing {0} updates in the background"
+msgstr ""
+
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "{name} is restarting now"
 msgstr ""
@@ -171,7 +181,6 @@ msgid "Agent up to date"
 msgstr ""
 
 #: src/components/systems-table/systems-table-columns.tsx
-#: src/components/update-agents-button.tsx
 msgid "Agent update failed"
 msgstr ""
 
@@ -215,7 +224,31 @@ msgid "All Systems"
 msgstr "Tüm Sistemler"
 
 #: src/components/update-agents-button.tsx
-msgid "Already current"
+#~ msgid "Already current"
+#~ msgstr ""
+
+#: src/components/update-agents-button.tsx
+msgid "Apply ALL package updates on every system?"
+msgstr ""
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Apply all updates"
+msgstr ""
+
+#: src/components/update-agents-button.tsx
+msgid "Apply all updates everywhere"
+msgstr ""
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Apply security updates"
+msgstr ""
+
+#: src/components/update-agents-button.tsx
+msgid "Apply security updates everywhere"
+msgstr ""
+
+#: src/components/update-agents-button.tsx
+msgid "Apply security updates on every system?"
 msgstr ""
 
 #: src/components/package-updates-table/package-updates-table.tsx
@@ -495,6 +528,7 @@ msgstr "Bağlantı kesildi"
 
 #: src/components/routes/settings/alerts-history-data-table.tsx
 #: src/components/systems-table/systems-table-columns.tsx
+#: src/components/update-agents-button.tsx
 msgid "Continue"
 msgstr "Devam et"
 
@@ -786,7 +820,19 @@ msgid "Error"
 msgstr "Hata"
 
 #: src/components/update-agents-button.tsx
-msgid "Every online system downloads the hub's current agent build, verifies it, and restarts its agent. Agents that are already current are skipped. Each system may show as down for a few seconds while its agent restarts."
+msgid "Every online system downloads the hub's current agent build, verifies it, and restarts its agent. Agents that are already current are skipped."
+msgstr ""
+
+#: src/components/update-agents-button.tsx
+#~ msgid "Every online system downloads the hub's current agent build, verifies it, and restarts its agent. Agents that are already current are skipped. Each system may show as down for a few seconds while its agent restarts."
+#~ msgstr ""
+
+#: src/components/update-agents-button.tsx
+msgid "Every online system with pending security updates installs them in the background (held packages are skipped)."
+msgstr ""
+
+#: src/components/update-agents-button.tsx
+msgid "Every online system with pending updates installs all of them in the background (held packages are skipped). Services on those systems may restart during upgrades."
 msgstr ""
 
 #. placeholder {0}: alert.value
@@ -893,6 +939,14 @@ msgstr "Parmak izi"
 #: src/components/routes/system/smart-table.tsx
 msgid "Firmware"
 msgstr "Donanım Yazılımı"
+
+#: src/components/update-agents-button.tsx
+msgid "Fleet"
+msgstr ""
+
+#: src/components/update-agents-button.tsx
+msgid "Fleet action failed"
+msgstr ""
 
 #: src/components/alerts/alerts-sheet.tsx
 msgid "For <0>{min}</0> {min, plural, one {minute} other {minutes}}"
@@ -1196,6 +1250,10 @@ msgstr "Sistem bulunamadı."
 msgid "No URLs configured"
 msgstr ""
 
+#: src/components/update-agents-button.tsx
+msgid "Nothing to do"
+msgstr ""
+
 #: src/components/command-palette.tsx
 #: src/components/routes/settings/layout.tsx
 #: src/components/routes/settings/notifications.tsx
@@ -1250,6 +1308,10 @@ msgstr ""
 
 #: src/components/package-updates-table/package-updates-table.tsx
 msgid "Package Updates"
+msgstr ""
+
+#: src/components/update-agents-button.tsx
+msgid "Package updates started"
 msgstr ""
 
 #: src/components/package-updates-table/package-updates-table.tsx
@@ -1393,8 +1455,8 @@ msgid "Public Key"
 msgstr "Genel Anahtar"
 
 #: src/components/update-agents-button.tsx
-msgid "Push the hub's agent build to all systems"
-msgstr ""
+#~ msgid "Push the hub's agent build to all systems"
+#~ msgstr ""
 
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Pushing agent update to {name}..."
@@ -1562,6 +1624,10 @@ msgstr ""
 msgid "Security update"
 msgstr ""
 
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Security updates started"
+msgstr ""
+
 #: src/components/package-updates-table/package-updates-table.tsx
 msgid "Security: {securityCount}."
 msgstr ""
@@ -1634,6 +1700,10 @@ msgstr "Sıralama Ölçütü"
 #: src/components/routes/settings/quiet-hours.tsx
 msgid "Start Time"
 msgstr "Başlangıç Saati"
+
+#: src/components/update-agents-button.tsx
+msgid "Started"
+msgstr ""
 
 #. Context: alert state (active or resolved)
 #: src/components/alerts-history-columns.tsx
@@ -1911,21 +1981,29 @@ msgid "Update agent"
 msgstr ""
 
 #: src/components/update-agents-button.tsx
-msgid "Update agents"
-msgstr ""
+#~ msgid "Update agents"
+#~ msgstr ""
 
 #: src/components/update-agents-button.tsx
-msgid "Update all"
+#~ msgid "Update all"
+#~ msgstr ""
+
+#: src/components/update-agents-button.tsx
+msgid "Update all agents"
 msgstr ""
 
 #: src/components/update-agents-button.tsx
 msgid "Update all agents?"
 msgstr ""
 
+#: src/components/systems-table/systems-table-columns.tsx
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Update failed"
+msgstr ""
+
 #: src/components/containers-table/containers-table-columns.tsx
 #: src/components/routes/system/smart-table.tsx
 #: src/components/systemd-table/systemd-table-columns.tsx
-#: src/components/update-agents-button.tsx
 msgid "Updated"
 msgstr "Güncellendi"
 
@@ -1935,6 +2013,10 @@ msgstr "Her 10 dakikada bir güncellenir."
 
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Updates"
+msgstr ""
+
+#: src/components/systems-table/systems-table-columns.tsx
+msgid "Updates started"
 msgstr ""
 
 #: src/components/routes/system/network-sheet.tsx

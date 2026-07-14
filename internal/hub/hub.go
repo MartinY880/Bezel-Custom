@@ -3,6 +3,7 @@ package hub
 
 import (
 	"crypto/ed25519"
+	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"net/http"
@@ -11,10 +12,12 @@ import (
 	"path"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/henrygd/beszel"
 	"github.com/henrygd/beszel/internal/alerts"
+	"github.com/henrygd/beszel/internal/common"
 	systemEntities "github.com/henrygd/beszel/internal/entities/system"
 	"github.com/henrygd/beszel/internal/hub/config"
 	"github.com/henrygd/beszel/internal/hub/systems"
@@ -333,6 +336,8 @@ func (h *Hub) registerApiRoutes(se *core.ServeEvent) error {
 	apiExt.POST("/systems/{id}/agent/update", h.updateAgent)
 	// push agent binary updates to every up system at once
 	apiExt.POST("/agents/update-all", h.updateAllAgents)
+	// start package updates on every up system with pending updates
+	apiExt.POST("/updates/apply-all", h.applyAllPackageUpdates)
 	// reboot a system's host (user-confirmed; used for reboot-required)
 	apiExt.POST("/systems/{id}/reboot", h.rebootSystem)
 
@@ -381,12 +386,14 @@ func (h *Hub) applyPackageUpdates(e *core.RequestEvent) error {
 	}
 
 	var body struct {
-		Packages []string `json:"packages"`
+		Packages     []string `json:"packages"`
+		All          bool     `json:"all"`
+		SecurityOnly bool     `json:"securityOnly"`
 	}
 	if err := e.BindBody(&body); err != nil {
 		return e.BadRequestError("invalid request body", nil)
 	}
-	if len(body.Packages) == 0 {
+	if len(body.Packages) == 0 && !body.All {
 		return e.BadRequestError("no packages specified", nil)
 	}
 	// same allowlist the agent and wrapper script enforce; fail fast at the hub
@@ -396,13 +403,84 @@ func (h *Hub) applyPackageUpdates(e *core.RequestEvent) error {
 		}
 	}
 
-	status, err := system.ApplyPackageUpdatesOnAgent(body.Packages)
+	status, err := system.ApplyPackageUpdatesOnAgent(common.ApplyPackageUpdatesRequest{
+		Packages:     body.Packages,
+		All:          body.All,
+		SecurityOnly: body.SecurityOnly,
+	})
 	if err != nil {
 		// Surface the real reason in the "message" field the SDK reads.
 		return apis.NewApiError(http.StatusBadGateway, "agent apply failed: "+err.Error(), nil)
 	}
 	// 202: the install runs in the background on the agent; poll /updates/status
 	return e.JSON(http.StatusAccepted, status)
+}
+
+// applyAllPackageUpdates handles POST /api/beszel-ext/updates/apply-all.
+// Body (optional): {"securityOnly": true}. Starts a background apply of every
+// available (non-held) update on each up system that has any, concurrently.
+// Returns a per-system result map: "started (N)", "no updates", or the error.
+func (h *Hub) applyAllPackageUpdates(e *core.RequestEvent) error {
+	var body struct {
+		SecurityOnly bool `json:"securityOnly"`
+	}
+	_ = e.BindBody(&body)
+
+	records, err := h.FindRecordsByFilter("systems", "status = 'up'", "", 500, 0)
+	if err != nil {
+		return apis.NewApiError(http.StatusInternalServerError, err.Error(), nil)
+	}
+
+	type outcome struct{ name, result string }
+	results := make(chan outcome, len(records))
+	var wg sync.WaitGroup
+	sem := make(chan struct{}, 5)
+	for _, rec := range records {
+		// skip systems with nothing to do (counts come from the stored info JSON)
+		var info struct {
+			Pu  uint16 `json:"pu"`
+			Pus uint16 `json:"pus"`
+		}
+		_ = json.Unmarshal([]byte(rec.GetString("info")), &info)
+		count := info.Pu
+		if body.SecurityOnly {
+			count = info.Pus
+		}
+		name := rec.GetString("name")
+		if count == 0 {
+			results <- outcome{name, "no updates"}
+			continue
+		}
+
+		wg.Add(1)
+		go func(id, name string, count uint16) {
+			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
+			system, err := h.sm.GetSystem(id)
+			if err != nil {
+				results <- outcome{name, "error: " + err.Error()}
+				return
+			}
+			status, err := system.ApplyPackageUpdatesOnAgent(common.ApplyPackageUpdatesRequest{
+				All:          true,
+				SecurityOnly: body.SecurityOnly,
+			})
+			if err != nil {
+				results <- outcome{name, "error: " + err.Error()}
+				return
+			}
+			results <- outcome{name, fmt.Sprintf("%s (%d)", status.Status, count)}
+		}(rec.Id, name, count)
+	}
+	wg.Wait()
+	close(results)
+
+	out := make(map[string]string, len(records))
+	for o := range results {
+		out[o.name] = o.result
+	}
+	return e.JSON(http.StatusOK, map[string]any{"results": out})
 }
 
 // packageUpdateStatus handles GET /api/beszel-ext/systems/{id}/updates/status.

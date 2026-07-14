@@ -510,17 +510,19 @@ func (sys *System) FetchPackageUpdatesFromAgent(refresh bool) ([]system.PackageU
 	return result, err
 }
 
-// ApplyPackageUpdatesOnAgent asks the agent to start installing the given
-// packages in the background. New agents ack immediately with a running job
+// ApplyPackageUpdatesOnAgent asks the agent to start installing packages in
+// the background (req.All applies everything non-held; req.SecurityOnly
+// narrows to security updates). New agents ack immediately with a running job
 // status (poll FetchPackageUpdateStatusFromAgent for the outcome). Legacy
 // (pre-async) fork agents install synchronously and reply with a
 // map[package]errMsg — the long timeout accommodates them, and their result
 // is converted to a final PackageApplyStatus.
-func (sys *System) ApplyPackageUpdatesOnAgent(packages []string) (common.PackageApplyStatus, error) {
+func (sys *System) ApplyPackageUpdatesOnAgent(req common.ApplyPackageUpdatesRequest) (common.PackageApplyStatus, error) {
+	packages := req.Packages
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Minute)
 	defer cancel()
 	var raw cbor.RawMessage
-	if err := sys.request(ctx, common.ApplyPackageUpdates, common.ApplyPackageUpdatesRequest{Packages: packages}, &raw); err != nil {
+	if err := sys.request(ctx, common.ApplyPackageUpdates, req, &raw); err != nil {
 		return common.PackageApplyStatus{}, err
 	}
 

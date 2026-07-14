@@ -248,11 +248,11 @@ func (h *ApplyPackageUpdatesHandler) Handle(hctx *HandlerContext) error {
 	if err := cbor.Unmarshal(hctx.Request.Data, &req); err != nil {
 		return err
 	}
-	if len(req.Packages) == 0 {
+	if len(req.Packages) == 0 && !req.All {
 		return errors.New("no packages specified")
 	}
 
-	status, err := hctx.Agent.pkgUpdateManager.startApply(req.Packages)
+	status, err := hctx.Agent.pkgUpdateManager.startApply(req)
 	if err != nil {
 		return err
 	}

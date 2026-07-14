@@ -428,15 +428,32 @@ type applyJob struct {
 // startApply validates the packages and launches the install detached.
 // It returns the job status (running) immediately, or an error if a job is
 // already in progress or the command could not be started.
-func (pm *pkgUpdateManager) startApply(packages []string) (common.PackageApplyStatus, error) {
+// With req.All, the package list is resolved from the cached updates (skipping
+// held packages; narrowed to security updates when req.SecurityOnly).
+func (pm *pkgUpdateManager) startApply(req common.ApplyPackageUpdatesRequest) (common.PackageApplyStatus, error) {
+	packages := req.Packages
+	pm.Lock()
+	defer pm.Unlock()
+
+	if req.All {
+		packages = packages[:0]
+		for _, u := range pm.updates {
+			if u.Held || (req.SecurityOnly && !u.Security) {
+				continue
+			}
+			packages = append(packages, u.Name)
+		}
+		if len(packages) == 0 {
+			return common.PackageApplyStatus{}, errors.New("no applicable updates (held packages are skipped)")
+		}
+	}
+
 	for _, pkg := range packages {
 		if !validPackageName.MatchString(pkg) {
 			return common.PackageApplyStatus{}, fmt.Errorf("invalid package name: %q", pkg)
 		}
 	}
 
-	pm.Lock()
-	defer pm.Unlock()
 	if pm.jobStatus.Status == common.PkgApplyRunning {
 		return pm.jobStatus, errors.New("a package apply is already running")
 	}
@@ -451,11 +468,23 @@ func (pm *pkgUpdateManager) startApply(packages []string) (common.PackageApplySt
 		}
 	}
 
-	argv, err := pm.applyArgv()
+	var argv []string
+	var err error
+	if req.All && !req.SecurityOnly && os.Geteuid() == 0 {
+		// Full upgrade uses the package manager's native "upgrade everything"
+		// mode: it holds back packages with unsatisfiable deps (e.g. blocked by
+		// a held dependency) instead of aborting the whole transaction, which
+		// an explicit package list would.
+		argv, err = pm.fullUpgradeArgv()
+	} else {
+		argv, err = pm.applyArgv()
+		if err == nil {
+			argv = append(argv, packages...)
+		}
+	}
 	if err != nil {
 		return common.PackageApplyStatus{}, err
 	}
-	argv = append(argv, packages...)
 
 	// sh script: run the install, capture all output, record the exit code.
 	// argv tokens are fixed commands + regex-validated package names, and the
@@ -584,6 +613,28 @@ func (pm *pkgUpdateManager) recoverJob() {
 	pm.Unlock()
 	slog.Info("Recovered in-flight package apply", "packages", len(job.Packages))
 	go pm.watchJob(&job)
+}
+
+// fullUpgradeArgv returns the package manager's native "upgrade everything
+// possible" command. Holds are respected and dependency-blocked packages are
+// kept back rather than failing the transaction.
+func (pm *pkgUpdateManager) fullUpgradeArgv() ([]string, error) {
+	switch pm.kind {
+	case pmApt:
+		// --with-new-pkgs allows installing new dependencies (like `apt upgrade`)
+		return []string{"apt-get", "upgrade", "--with-new-pkgs", "-y"}, nil
+	case pmDnf:
+		bin := "dnf"
+		if _, err := exec.LookPath(bin); err != nil {
+			bin = "yum"
+		}
+		return []string{bin, "update", "-y"}, nil
+	case pmApk:
+		return []string{"apk", "upgrade"}, nil
+	case pmPacman:
+		return []string{"pacman", "-Syu", "--noconfirm"}, nil
+	}
+	return nil, errors.ErrUnsupported
 }
 
 // applyArgv returns the install command for this package manager (without

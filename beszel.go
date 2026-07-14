@@ -12,7 +12,7 @@ const (
 	// feature gates (0.14/0.15/0.16) compare this value, so a lower version
 	// (e.g. 0.5.x) would silently disable features and legacy-downgrade the
 	// protocol.
-	Version = "5.24.0"
+	Version = "5.24.2"
 	// AppName is the name of the application.
 	AppName = "beszel"
 )

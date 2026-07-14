@@ -92,6 +92,11 @@ type PackageUpdatesRequest struct {
 
 type ApplyPackageUpdatesRequest struct {
 	Packages []string `cbor:"0,keyasint"`
+	// All applies every cached non-held update (Packages is ignored), so the
+	// hub can trigger "update everything" without shipping package lists.
+	All bool `cbor:"1,keyasint,omitempty"`
+	// SecurityOnly narrows All to security updates.
+	SecurityOnly bool `cbor:"2,keyasint,omitempty"`
 }
 
 // Package apply job states reported in PackageApplyStatus.Status

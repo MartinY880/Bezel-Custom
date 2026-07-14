@@ -17,6 +17,7 @@ import {
 	MoreHorizontalIcon,
 	PackageIcon,
 	PauseCircleIcon,
+	ShieldAlertIcon,
 	PenBoxIcon,
 	PlayCircleIcon,
 	RotateCcwIcon,
@@ -722,6 +723,52 @@ export const ActionsButton = memo(({ system }: { system: SystemRecord }) => {
 						>
 							<DownloadIcon className="me-2.5 size-4" />
 							<Trans>Update agent</Trans>
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							className={cn(
+								(isReadOnlyUser() || status !== SystemStatus.Up || !(system.info?.pu ?? 0)) && "hidden"
+							)}
+							onClick={async () => {
+								try {
+									await pb.send(`/api/beszel-ext/systems/${id}/updates/apply`, {
+										method: "POST",
+										body: { all: true },
+										requestKey: null,
+									})
+									toast({
+										title: t`Updates started`,
+										description: t`${name} is installing ${system.info?.pu ?? 0} updates in the background`,
+									})
+								} catch (error: any) {
+									toast({ title: t`Update failed`, description: error?.message })
+								}
+							}}
+						>
+							<PackageIcon className="me-2.5 size-4" />
+							<Trans>Apply all updates</Trans> ({system.info?.pu ?? 0})
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							className={cn(
+								(isReadOnlyUser() || status !== SystemStatus.Up || !(system.info?.pus ?? 0)) && "hidden"
+							)}
+							onClick={async () => {
+								try {
+									await pb.send(`/api/beszel-ext/systems/${id}/updates/apply`, {
+										method: "POST",
+										body: { all: true, securityOnly: true },
+										requestKey: null,
+									})
+									toast({
+										title: t`Security updates started`,
+										description: t`${name} is installing ${system.info?.pus ?? 0} security updates in the background`,
+									})
+								} catch (error: any) {
+									toast({ title: t`Update failed`, description: error?.message })
+								}
+							}}
+						>
+							<ShieldAlertIcon className="me-2.5 size-4 text-red-500" />
+							<Trans>Apply security updates</Trans> ({system.info?.pus ?? 0})
 						</DropdownMenuItem>
 						<DropdownMenuItem
 							className={cn((isReadOnlyUser() || status !== SystemStatus.Up) && "hidden")}
