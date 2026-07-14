@@ -83,6 +83,7 @@ func newPkgUpdateManager(dataDir string) *pkgUpdateManager {
 			slog.Warn("Invalid UPDATE_CHECK_INTERVAL", "err", err)
 		}
 	}
+	pm.loadUpdates()
 	pm.recoverJob()
 	pm.startWorker()
 	return pm
@@ -225,8 +226,38 @@ func (pm *pkgUpdateManager) refresh() error {
 	pm.updates = updates
 	pm.lastChecked = time.Now()
 	pm.Unlock()
+	pm.saveUpdates(updates)
 	slog.Debug("Package updates", "count", len(updates))
 	return nil
+}
+
+func (pm *pkgUpdateManager) updatesPath() string {
+	return filepath.Join(pm.jobDir, "pkg-updates.json")
+}
+
+// saveUpdates persists the cached update list so a restarted agent boots with
+// its last-known state instead of an empty cache (which otherwise makes the
+// all-systems badge and the detail view disagree until the first check runs).
+func (pm *pkgUpdateManager) saveUpdates(updates []system.PackageUpdate) {
+	if data, err := json.Marshal(updates); err == nil {
+		_ = os.WriteFile(pm.updatesPath(), data, 0600)
+	}
+}
+
+// loadUpdates restores the persisted update list on startup.
+func (pm *pkgUpdateManager) loadUpdates() {
+	data, err := os.ReadFile(pm.updatesPath())
+	if err != nil {
+		return
+	}
+	var updates []system.PackageUpdate
+	if err := json.Unmarshal(data, &updates); err != nil {
+		return
+	}
+	pm.Lock()
+	pm.updates = updates
+	pm.Unlock()
+	slog.Debug("Loaded persisted package updates", "count", len(updates))
 }
 
 func checkApt(ctx context.Context) ([]system.PackageUpdate, error) {
@@ -303,13 +334,14 @@ func (pm *pkgUpdateManager) setHold(pkg string, hold bool) error {
 func (pm *pkgUpdateManager) refreshHeldFlags(ctx context.Context) {
 	held := aptHeldPackages(ctx)
 	pm.Lock()
-	defer pm.Unlock()
 	updated := make([]system.PackageUpdate, len(pm.updates))
 	for i, u := range pm.updates {
 		u.Held = held[u.Name]
 		updated[i] = u
 	}
 	pm.updates = updated
+	pm.Unlock()
+	pm.saveUpdates(updated)
 }
 
 // aptHeldPackages returns the set of packages pinned via apt-mark hold.
