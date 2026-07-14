@@ -13,6 +13,11 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#. placeholder {0}: system.name
+#: src/components/systems-table/reboot-button.tsx
+msgid "{0} is restarting now"
+msgstr "{0} is restarting now"
+
 #. placeholder {0}: table.getFilteredSelectedRowModel().rows.length
 #. placeholder {1}: table.getFilteredRowModel().rows.length
 #: src/components/routes/settings/alerts-history-data-table.tsx
@@ -414,6 +419,7 @@ msgstr "Can stop"
 #: src/components/routes/settings/general.tsx
 #: src/components/routes/settings/general.tsx
 #: src/components/routes/settings/quiet-hours.tsx
+#: src/components/systems-table/reboot-button.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 #: src/components/update-agents-button.tsx
@@ -1488,26 +1494,39 @@ msgstr "Quiet Hours"
 msgid "Read"
 msgstr "Read"
 
+#: src/components/systems-table/reboot-button.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Reboot"
 msgstr "Reboot"
+
+#. placeholder {0}: system.name
+#: src/components/systems-table/reboot-button.tsx
+msgid "Reboot {0}?"
+msgstr "Reboot {0}?"
 
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Reboot {name}?"
 msgstr "Reboot {name}?"
 
+#: src/components/systems-table/reboot-button.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Reboot failed"
 msgstr "Reboot failed"
 
+#: src/components/systems-table/reboot-button.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Reboot required"
 msgstr "Reboot required"
+
+#: src/components/systems-table/reboot-button.tsx
+msgid "Reboot required to finish updates"
+msgstr "Reboot required to finish updates"
 
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Reboot system"
 msgstr "Reboot system"
 
+#: src/components/systems-table/reboot-button.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Rebooting"
 msgstr "Rebooting"
@@ -1824,6 +1843,10 @@ msgstr "This action cannot be undone. This will permanently delete all current r
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "This system needs a reboot to finish applying updates."
 msgstr "This system needs a reboot to finish applying updates."
+
+#: src/components/systems-table/reboot-button.tsx
+msgid "This system needs a reboot to finish applying updates. It will show as down for a short time while it comes back up."
+msgstr "This system needs a reboot to finish applying updates. It will show as down for a short time while it comes back up."
 
 #: src/components/routes/settings/alerts-history-data-table.tsx
 msgid "This will permanently delete all selected records from the database."

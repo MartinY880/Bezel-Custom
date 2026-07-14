@@ -46,6 +46,7 @@ import { $downSystems, $pausedSystems, $systems, $upSystems } from "@/lib/stores
 import { cn, runOnce, useBrowserStorage } from "@/lib/utils"
 import type { SystemRecord } from "@/types"
 import AlertButton from "../alerts/alert-button"
+import RebootButton from "./reboot-button"
 import { $router, Link } from "../router"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
 import { SystemsTableColumns, ActionsButton, IndicatorDot } from "./systems-table-columns"
@@ -472,6 +473,7 @@ const SystemCard = memo(
 							</CardTitle>
 							{table.getColumn("actions")?.getIsVisible() && (
 								<div className="flex gap-1 shrink-0 relative z-10">
+									<RebootButton system={system} />
 									<AlertButton system={system} />
 									<ActionsButton system={system} />
 								</div>

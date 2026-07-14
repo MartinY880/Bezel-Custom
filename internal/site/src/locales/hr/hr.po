@@ -18,6 +18,11 @@ msgstr ""
 "X-Crowdin-File: /main/internal/site/src/locales/en/en.po\n"
 "X-Crowdin-File-ID: 32\n"
 
+#. placeholder {0}: system.name
+#: src/components/systems-table/reboot-button.tsx
+msgid "{0} is restarting now"
+msgstr ""
+
 #. placeholder {0}: table.getFilteredSelectedRowModel().rows.length
 #. placeholder {1}: table.getFilteredRowModel().rows.length
 #: src/components/routes/settings/alerts-history-data-table.tsx
@@ -419,6 +424,7 @@ msgstr "Može se zaustaviti"
 #: src/components/routes/settings/general.tsx
 #: src/components/routes/settings/general.tsx
 #: src/components/routes/settings/quiet-hours.tsx
+#: src/components/systems-table/reboot-button.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 #: src/components/update-agents-button.tsx
@@ -1493,26 +1499,39 @@ msgstr "Tihi sati"
 msgid "Read"
 msgstr "Pročitaj"
 
+#: src/components/systems-table/reboot-button.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Reboot"
+msgstr ""
+
+#. placeholder {0}: system.name
+#: src/components/systems-table/reboot-button.tsx
+msgid "Reboot {0}?"
 msgstr ""
 
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Reboot {name}?"
 msgstr ""
 
+#: src/components/systems-table/reboot-button.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Reboot failed"
 msgstr ""
 
+#: src/components/systems-table/reboot-button.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Reboot required"
+msgstr ""
+
+#: src/components/systems-table/reboot-button.tsx
+msgid "Reboot required to finish updates"
 msgstr ""
 
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Reboot system"
 msgstr ""
 
+#: src/components/systems-table/reboot-button.tsx
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "Rebooting"
 msgstr ""
@@ -1828,6 +1847,10 @@ msgstr "Ova radnja se ne može poništiti. Ovo će trajno izbrisati sve trenutne
 
 #: src/components/systems-table/systems-table-columns.tsx
 msgid "This system needs a reboot to finish applying updates."
+msgstr ""
+
+#: src/components/systems-table/reboot-button.tsx
+msgid "This system needs a reboot to finish applying updates. It will show as down for a short time while it comes back up."
 msgstr ""
 
 #: src/components/routes/settings/alerts-history-data-table.tsx
