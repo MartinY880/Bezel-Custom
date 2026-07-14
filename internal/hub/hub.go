@@ -332,6 +332,8 @@ func (h *Hub) registerApiRoutes(se *core.ServeEvent) error {
 	apiExt.POST("/systems/{id}/updates/apply", h.applyPackageUpdates)
 	// poll the status of a background apply job
 	apiExt.GET("/systems/{id}/updates/status", h.packageUpdateStatus)
+	// hold/unhold a package (apt-mark)
+	apiExt.POST("/systems/{id}/updates/hold", h.setPackageHold)
 	// push a fork agent binary update to a system's agent
 	apiExt.POST("/systems/{id}/agent/update", h.updateAgent)
 	// push agent binary updates to every up system at once
@@ -481,6 +483,29 @@ func (h *Hub) applyAllPackageUpdates(e *core.RequestEvent) error {
 		out[o.name] = o.result
 	}
 	return e.JSON(http.StatusOK, map[string]any{"results": out})
+}
+
+// setPackageHold handles POST /api/beszel-ext/systems/{id}/updates/hold.
+// Body: {"package": "name", "hold": true|false}.
+func (h *Hub) setPackageHold(e *core.RequestEvent) error {
+	system, err := h.sm.GetSystem(e.Request.PathValue("id"))
+	if err != nil {
+		return e.NotFoundError("system not found", nil)
+	}
+	var body struct {
+		Package string `json:"package"`
+		Hold    bool   `json:"hold"`
+	}
+	if err := e.BindBody(&body); err != nil || body.Package == "" {
+		return e.BadRequestError("package is required", nil)
+	}
+	if !validPackageName.MatchString(body.Package) {
+		return e.BadRequestError("invalid package name", nil)
+	}
+	if err := system.SetPackageHoldOnAgent(body.Package, body.Hold); err != nil {
+		return apis.NewApiError(http.StatusBadGateway, err.Error(), nil)
+	}
+	return e.JSON(http.StatusOK, map[string]bool{"held": body.Hold})
 }
 
 // packageUpdateStatus handles GET /api/beszel-ext/systems/{id}/updates/status.

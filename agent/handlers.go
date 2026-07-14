@@ -56,6 +56,7 @@ func NewHandlerRegistry() *HandlerRegistry {
 	registry.Register(common.GetPackageUpdateStatus, &GetPackageUpdateStatusHandler{})
 	registry.Register(common.UpdateAgent, &UpdateAgentHandler{})
 	registry.Register(common.RebootSystem, &RebootSystemHandler{})
+	registry.Register(common.SetPackageHold, &SetPackageHoldHandler{})
 
 	return registry
 }
@@ -275,6 +276,29 @@ func (h *GetPackageUpdateStatusHandler) Handle(hctx *HandlerContext) error {
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 
+// SetPackageHoldHandler pins/unpins a package (apt-mark hold/unhold)
+type SetPackageHoldHandler struct{}
+
+func (h *SetPackageHoldHandler) Handle(hctx *HandlerContext) error {
+	if hctx.Agent.pkgUpdateManager == nil {
+		return errors.ErrUnsupported
+	}
+	var req common.SetPackageHoldRequest
+	if err := cbor.Unmarshal(hctx.Request.Data, &req); err != nil {
+		return err
+	}
+	if err := hctx.Agent.pkgUpdateManager.setHold(req.Package, req.Hold); err != nil {
+		return err
+	}
+	// return a struct (not a bare string): string responses go into the legacy
+	// AgentResponse.String field, which the hub can only decode for the
+	// original actions 0-5 — a struct uses the generic Data field instead.
+	return hctx.SendResponse(map[string]bool{"held": req.Hold}, hctx.RequestID)
+}
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
 // RebootSystemHandler reboots the host. Used from the hub UI when a system
 // reports RebootRequired after updates; the user confirms in a dialog first.
 type RebootSystemHandler struct{}
@@ -283,7 +307,9 @@ func (h *RebootSystemHandler) Handle(hctx *HandlerContext) error {
 	if err := rebootHost(); err != nil {
 		return err
 	}
-	return hctx.SendResponse("rebooting", hctx.RequestID)
+	// struct (not bare string) so it uses the generic Data field — see the
+	// note in SetPackageHoldHandler.
+	return hctx.SendResponse(map[string]bool{"rebooting": true}, hctx.RequestID)
 }
 
 ////////////////////////////////////////////////////////////////////////////

@@ -270,6 +270,33 @@ func checkApt(ctx context.Context) ([]system.PackageUpdate, error) {
 	return updates, nil
 }
 
+// setHold pins or unpins a package via apt-mark, then refreshes the cached
+// update list so the Held flags reflect the change. apt-only.
+func (pm *pkgUpdateManager) setHold(pkg string, hold bool) error {
+	if !validPackageName.MatchString(pkg) {
+		return fmt.Errorf("invalid package name: %q", pkg)
+	}
+	if pm.kind != pmApt {
+		return errors.New("hold/unhold is only supported on apt (Debian/Ubuntu) systems")
+	}
+	if os.Geteuid() != 0 {
+		return errors.New("hold/unhold requires the agent to run as root")
+	}
+	action := "unhold"
+	if hold {
+		action = "hold"
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	if out, err := exec.CommandContext(ctx, "apt-mark", action, pkg).CombinedOutput(); err != nil {
+		return fmt.Errorf("apt-mark %s failed: %s", action, applyErrorMessage(err, string(out)))
+	}
+	if err := pm.refresh(); err != nil {
+		slog.Debug("Package update check failed after hold change", "err", err)
+	}
+	return nil
+}
+
 // aptHeldPackages returns the set of packages pinned via apt-mark hold.
 // Held packages can't be upgraded by apply, so the UI marks them unselectable.
 func aptHeldPackages(ctx context.Context) map[string]bool {
@@ -674,6 +701,23 @@ func (pm *pkgUpdateManager) saveJob(job *applyJob) {
 	if data, err := json.Marshal(job); err == nil {
 		_ = os.WriteFile(pm.jobPath(), data, 0600)
 	}
+}
+
+// applyErrorMessage extracts a short, useful message from command output,
+// falling back to the error itself.
+func applyErrorMessage(err error, output string) string {
+	msg := err.Error()
+	lines := strings.Split(strings.TrimSpace(output), "\n")
+	for i := len(lines) - 1; i >= 0; i-- {
+		if line := strings.TrimSpace(lines[i]); line != "" {
+			msg = line
+			break
+		}
+	}
+	if len(msg) > 300 {
+		msg = msg[:300]
+	}
+	return msg
 }
 
 // applyLogTail returns the last part of the apply log for failure messages.

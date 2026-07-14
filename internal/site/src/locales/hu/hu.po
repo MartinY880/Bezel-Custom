@@ -54,6 +54,14 @@ msgstr ""
 msgid "{name} is restarting now"
 msgstr ""
 
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "{pkg} held"
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "{pkg} unheld"
+msgstr ""
+
 #: src/components/routes/system/info-bar.tsx
 msgid "{threads, plural, one {# thread} other {# threads}}"
 msgstr "{threads, plural, one {# szál} other {# szál}}"
@@ -809,6 +817,7 @@ msgstr "Ideiglenes"
 #: src/components/login/auth-form.tsx
 #: src/components/package-updates-table/package-updates-table.tsx
 #: src/components/package-updates-table/package-updates-table.tsx
+#: src/components/package-updates-table/package-updates-table.tsx
 #: src/components/routes/settings/alerts-history-data-table.tsx
 #: src/components/routes/settings/config-yaml.tsx
 #: src/components/routes/settings/notifications.tsx
@@ -894,6 +903,10 @@ msgstr "Sikertelen attribútumok:"
 #: src/lib/api.ts
 msgid "Failed to authenticate"
 msgstr "Hitelesítés sikertelen"
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Failed to change hold"
+msgstr ""
 
 #: src/components/package-updates-table/package-updates-table.tsx
 msgid "Failed to check for updates"
@@ -999,6 +1012,10 @@ msgstr "Egészség"
 
 #: src/components/package-updates-table/package-updates-table.tsx
 msgid "Held"
+msgstr ""
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Hold (pin, prevent updates)"
 msgstr ""
 
 #: src/components/add-system.tsx
@@ -1937,6 +1954,10 @@ msgstr "Riaszt, ha a lemezhasználat túllép egy küszöbértéket"
 #: src/components/routes/system/smart-table.tsx
 msgid "Type"
 msgstr "Típus"
+
+#: src/components/package-updates-table/package-updates-table.tsx
+msgid "Unhold (allow updates)"
+msgstr ""
 
 #: src/components/systemd-table/systemd-table.tsx
 msgid "Unit file"

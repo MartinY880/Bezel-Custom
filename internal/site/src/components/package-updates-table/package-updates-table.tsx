@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro"
 import { Trans } from "@lingui/react/macro"
-import { DownloadIcon, LoaderCircleIcon, RefreshCwIcon, ShieldAlertIcon } from "lucide-react"
+import { DownloadIcon, LoaderCircleIcon, LockIcon, LockOpenIcon, RefreshCwIcon, ShieldAlertIcon } from "lucide-react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -222,6 +222,23 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 		})
 	}, [])
 
+	const setHold = useCallback(
+		async (pkg: string, hold: boolean) => {
+			try {
+				await pb.send(`/api/beszel-ext/systems/${systemId}/updates/hold`, {
+					method: "POST",
+					body: { package: pkg, hold },
+					requestKey: null,
+				})
+				toast({ description: hold ? t`${pkg} held` : t`${pkg} unheld` })
+				await fetchUpdates(false)
+			} catch (error: any) {
+				toast({ title: t`Error`, description: error?.message ?? t`Failed to change hold` })
+			}
+		},
+		[systemId, fetchUpdates]
+	)
+
 	// hide entirely if the agent doesn't support package updates or hasn't responded yet
 	if (unsupported || updates === null) {
 		return null
@@ -328,6 +345,7 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 								<TableHead>
 									<Trans>Available version</Trans>
 								</TableHead>
+								<TableHead className="w-10" />
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -371,11 +389,29 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 										</TableCell>
 										<TableCell className="py-2.5 text-muted-foreground">{update.cv || "—"}</TableCell>
 										<TableCell className="py-2.5">{update.av || "—"}</TableCell>
+										<TableCell className="py-2.5 pe-3 text-end">
+											<Button
+												variant="ghost"
+												size="icon"
+												className="size-7"
+												title={update.hd ? t`Unhold (allow updates)` : t`Hold (pin, prevent updates)`}
+												onClick={(e) => {
+													e.stopPropagation()
+													setHold(update.n, !update.hd)
+												}}
+											>
+												{update.hd ? (
+													<LockOpenIcon className="size-3.5" />
+												) : (
+													<LockIcon className="size-3.5 opacity-40" />
+												)}
+											</Button>
+										</TableCell>
 									</TableRow>
 								))
 							) : (
 								<TableRow>
-									<TableCell colSpan={4} className="h-24 text-center pointer-events-none">
+									<TableCell colSpan={5} className="h-24 text-center pointer-events-none">
 										<Trans>No results.</Trans>
 									</TableCell>
 								</TableRow>

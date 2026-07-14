@@ -33,6 +33,8 @@ const (
 	// Tell the agent to reboot the host (used when a reboot is required to
 	// finish applying updates)
 	RebootSystem
+	// Hold or unhold a package (apt-mark hold/unhold)
+	SetPackageHold
 	// Add new actions here...
 )
 
@@ -88,6 +90,12 @@ type SystemdInfoRequest struct {
 
 type PackageUpdatesRequest struct {
 	Refresh bool `cbor:"0,keyasint,omitempty"` // force a fresh check instead of returning cached results
+}
+
+// SetPackageHoldRequest pins (Hold=true) or unpins a package via apt-mark.
+type SetPackageHoldRequest struct {
+	Package string `cbor:"0,keyasint"`
+	Hold    bool   `cbor:"1,keyasint,omitempty"`
 }
 
 type ApplyPackageUpdatesRequest struct {

@@ -567,12 +567,20 @@ func (sys *System) UpdateAgentFromHub(hubURL string, checksums map[string]string
 	return result, err
 }
 
+// SetPackageHoldOnAgent pins/unpins a package on the agent (apt-mark).
+func (sys *System) SetPackageHoldOnAgent(pkg string, hold bool) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	var result map[string]bool
+	return sys.request(ctx, common.SetPackageHold, common.SetPackageHoldRequest{Package: pkg, Hold: hold}, &result)
+}
+
 // RebootHostViaAgent asks the agent to reboot its host (2s delayed so the
 // response arrives first).
 func (sys *System) RebootHostViaAgent() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
-	var result string
+	var result map[string]bool
 	return sys.request(ctx, common.RebootSystem, nil, &result)
 }
 
