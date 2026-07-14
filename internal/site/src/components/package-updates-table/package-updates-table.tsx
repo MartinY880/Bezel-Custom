@@ -224,6 +224,16 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 
 	const setHold = useCallback(
 		async (pkg: string, hold: boolean) => {
+			// optimistic: flip the flag right away so the row updates instantly.
+			setUpdates((cur) => cur?.map((u) => (u.n === pkg ? { ...u, hd: hold } : u)) ?? cur)
+			if (hold) {
+				// a held package can't be selected
+				setSelected((cur) => {
+					const next = new Set(cur)
+					next.delete(pkg)
+					return next
+				})
+			}
 			try {
 				await pb.send(`/api/beszel-ext/systems/${systemId}/updates/hold`, {
 					method: "POST",
@@ -231,9 +241,12 @@ export default function PackageUpdatesTable({ systemId }: { systemId: string }) 
 					requestKey: null,
 				})
 				toast({ description: hold ? t`${pkg} held` : t`${pkg} unheld` })
-				await fetchUpdates(false)
+				// reconcile with the agent's real state (don't block the UI on it)
+				fetchUpdates(false).catch(() => {})
 			} catch (error: any) {
 				toast({ title: t`Error`, description: error?.message ?? t`Failed to change hold` })
+				// revert the optimistic change to the truth
+				fetchUpdates(false).catch(() => {})
 			}
 		},
 		[systemId, fetchUpdates]

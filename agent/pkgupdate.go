@@ -291,10 +291,25 @@ func (pm *pkgUpdateManager) setHold(pkg string, hold bool) error {
 	if out, err := exec.CommandContext(ctx, "apt-mark", action, pkg).CombinedOutput(); err != nil {
 		return fmt.Errorf("apt-mark %s failed: %s", action, applyErrorMessage(err, string(out)))
 	}
-	if err := pm.refresh(); err != nil {
-		slog.Debug("Package update check failed after hold change", "err", err)
-	}
+	// Only the held flags changed — re-read apt-mark showhold and update them on
+	// the cached list. A full refresh() would run apt-get update (slow, network)
+	// for no reason, since hold status doesn't change what's upgradable.
+	pm.refreshHeldFlags(ctx)
 	return nil
+}
+
+// refreshHeldFlags re-reads apt-mark showhold and updates the Held flag on the
+// cached updates without a full (slow) package-index refresh.
+func (pm *pkgUpdateManager) refreshHeldFlags(ctx context.Context) {
+	held := aptHeldPackages(ctx)
+	pm.Lock()
+	defer pm.Unlock()
+	updated := make([]system.PackageUpdate, len(pm.updates))
+	for i, u := range pm.updates {
+		u.Held = held[u.Name]
+		updated[i] = u
+	}
+	pm.updates = updated
 }
 
 // aptHeldPackages returns the set of packages pinned via apt-mark hold.
