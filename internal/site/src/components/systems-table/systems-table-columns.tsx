@@ -460,7 +460,7 @@ export function SystemsTableColumns(viewMode: "table" | "grid"): ColumnDef<Syste
 							<ChevronRightSquareIcon className={cn("size-3 pointer-events-none", color)} />
 						)}
 						{!system.info.ct && <IndicatorDot system={system} className={cn(color, "bg-current mx-0.5")} />}
-						<span className="truncate max-w-14">{info.getValue() as string}</span>
+						<span className="whitespace-nowrap">{info.getValue() as string}</span>
 					</Link>
 				)
 			},
